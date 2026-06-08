@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { COURSE_STATUS } from "../utils/constants";
+import { COURSE_STATUS, CONTENT_TYPE } from "../utils/constants.js";
 
 const courseSchema = new mongoose.Schema(
   {
@@ -98,4 +98,7 @@ const contentSchema = new mongoose.Schema(
 
 export const courseModel = mongoose.model("courses", courseSchema);
 export const courseFolderModel = mongoose.model("course_folders", folderSchema);
-export const courseContentModel = mongoose.model("course_contents", contentSchema);
+export const courseContentModel = mongoose.model(
+  "course_contents",
+  contentSchema,
+);
