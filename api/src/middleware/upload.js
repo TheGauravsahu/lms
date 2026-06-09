@@ -6,15 +6,21 @@ const imagekit = new ImageKit({
 });
 
 export const uploadMiddleware = async (req, res, next) => {
-  if (!req.file) {
-    return res.error(400, null, "No file uploaded");
+  try {
+    const result = await imagekit.files.upload({
+      file: await toFile(req.file.buffer, req.file.originalname),
+      fileName: req.file.originalname,
+      folder: "/lms_uploads",
+    });
+
+    const upload = {
+      url: result.url,
+      size: result.size,
+    };
+    console.log("UPLOADED ✅", upload);
+    req.upload = upload;
+    next();
+  } catch (err) {
+    next(err);
   }
-  const result = await imagekit.files.upload({
-    file: await toFile(req.file.buffer, req.file.originalname),
-    fileName: req.file.originalname,
-    folder: "/lms_uploads",
-  });
-  console.log("UPLOADED ✅", result);
-  req.thumbnail_url = result.url;
-  next();
 };

@@ -8,7 +8,8 @@ const courseSchema = new mongoose.Schema(
       required: true,
     },
     thumbnail: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "uploads",
       required: true,
     },
     validity: {
@@ -63,7 +64,8 @@ const folderSchema = new mongoose.Schema(
       required: true,
     },
     thumbnail: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "uploads",
       required: true,
     },
   },
@@ -81,17 +83,21 @@ const contentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    type: {
+    thumbnail: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "uploads",
+      default: null,
+    },
+    content_type: {
       type: String,
       enum: CONTENT_TYPE,
       required: true,
     },
-    url: {
-      type: String,
+    content_url: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "uploads",
       required: true,
     },
-    duration: Number,
-    size: Number,
   },
   { timestamps: true },
 );
