@@ -10,6 +10,7 @@ const accountSchema = new mongoose.Schema(
     mobile_no: {
       type: String,
       required: true,
+      unique: true,
     },
     email: String,
     status: {
