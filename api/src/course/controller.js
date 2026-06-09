@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { courseModel } from "./models/course.js";
 import { courseFolderModel } from "./models/folder.js";
 import { courseContentModel } from "./models/content.js";
+import { courseService } from "./service.js";
 
 class CourseController {
   createCourse = asyncHandler(async (req, res) => {
@@ -20,24 +21,15 @@ class CourseController {
   });
 
   getAllCourses = asyncHandler(async (req, res) => {
-    const data = await courseModel.find();
+    const data = await courseService.getAllCourses();
     res.success(200, data, "Courses fetched successfully");
   });
 
   getCourseDetails = asyncHandler(async (req, res) => {
     const { course_id } = req.body;
-    const overview = await courseModel
-      .findById(course_id)
-      .populate("thumbnail", "url");
-    if (!overview) {
-      return res.error(404, "Course not found");
-    }
+    const data = await courseService.getCourseDetails(course_id);
+    if (!data.overview) return res.error(404, "Not Found", "Course not found");
 
-    const content = await courseFolderModel
-      .find({ course_id, parent_id: null })
-      .populate("thumbnail", "url");
-
-    const data = { overview, content };
     res.success(200, data, "Course details fetched successfully.");
   });
 
@@ -55,10 +47,8 @@ class CourseController {
 
   searchCourse = asyncHandler(async (req, res) => {
     const { q = "" } = req.query;
-    const courses = await courseModel.find({
-      title: { $regex: q, $options: "i" },
-    });
-    res.success(200, courses, "Courses fetched successfully");
+    const courses = await courseService.searchCourse(q);
+    res.success(200, courses, "Courses searched successfully");
   });
 
   // course_folders
