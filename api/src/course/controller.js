@@ -17,7 +17,39 @@ class CourseController {
     res.success(201, course, "Course created successfully");
   });
 
-  getAllCoureses = asyncHandler((req, res) => {});
+  getAllCourses = asyncHandler(async (req, res) => {
+    const data = await courseModel.find();
+    res.success(200, data, "Courses fetched successfully");
+  });
+
+  getCourseDetails = asyncHandler(async (req, res) => {
+    const { course_id } = req.body;
+    const overview = await courseModel
+      .findById(course_id)
+      .populate("thumbnail", "url");
+    if (!overview) {
+      return res.error(404, "Course not found");
+    }
+
+    const content = await courseFolderModel
+      .find({ course_id, parent_id: null })
+      .populate("thumbnail", "url");
+
+    const data = { overview, content };
+    res.success(200, data, "Course details fetched successfully.");
+  });
+
+  editCourseDetails = asyncHandler(async (req, res) => {
+    const { course_id, edit } = req.body;
+    const course = await courseModel.findById(course_id);
+    if (!course) return res.error(404, null, "Course Not found");
+
+    const updatedCourse = await courseModel.findByIdAndUpdate(course_id, edit, {
+      new: true,
+      runValidators: true,
+    });
+    res.success(200, updatedCourse, "Course edited successfully");
+  });
 
   // course_folders
   createCourseFolder = asyncHandler(async (req, res) => {
@@ -32,18 +64,40 @@ class CourseController {
     res.success(201, folder, "Course folder created successfully");
   });
 
+  getAllCourseFolders = asyncHandler(async (req, res) => {
+    const { parent_id, course_id } = req.body;
+    let folders;
+    if (parent_id) {
+      folders = await courseFolderModel
+        .find({ parentId, course_id })
+        .populate("thumbnail", "url");
+    }
+    folders = await courseFolderModel
+      .find({ course_id })
+      .populate("thumbnail", "url");
+    res.success(200, folders, "Course folders fetched successfully");
+  });
+
   // course_content
   createCourseContent = asyncHandler(async (req, res) => {
-    console.log(req);
-    const { folder_id, title, content_type, thumbnail, content_url } = req.body;
-    const content = await courseContentModel.create({
+    const { folder_id, title, content_type, thumbnail, content } = req.body;
+    const data = await courseContentModel.create({
       folder_id,
       title,
       content_type,
-      content_url,
+      content,
     });
 
-    res.success(201, content, "Course content created successfully");
+    res.success(201, data, "Course content created successfully");
+  });
+
+  getAllCourseContents = asyncHandler(async (req, res) => {
+    const { folder_id } = req.body;
+    const contents = await courseContentModel
+      .find({ folder_id })
+      .populate("thumbnail content", "url");
+
+    res.success(200, contents, "Course contents fetched successfully");
   });
 }
 

@@ -93,7 +93,7 @@ const contentSchema = new mongoose.Schema(
       enum: CONTENT_TYPE,
       required: true,
     },
-    content_url: {
+    content: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "uploads",
       required: true,

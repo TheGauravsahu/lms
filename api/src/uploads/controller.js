@@ -11,6 +11,14 @@ class UploadController {
     });
     res.success(201, data, "File uploaded successfully");
   });
+
+  getRecentUploads = asyncHandler(async (req, res) => {
+    res.success(
+      200,
+      await uploadModel.find().limit(5), // todo: add .sort(createdAt)
+      "Recent Uplods fetched successfully.",
+    );
+  });
 }
 
 export const uploadController = new UploadController();

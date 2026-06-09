@@ -12,4 +12,6 @@ r.post(
   uploadController.uploadFile,
 );
 
+r.get("/recent-uploads", uploadController.getRecentUploads);
+
 export default r;
