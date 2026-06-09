@@ -35,13 +35,8 @@ class CourseController {
 
   editCourseDetails = asyncHandler(async (req, res) => {
     const { course_id, edit } = req.body;
-    const course = await courseModel.findById(course_id);
-    if (!course) return res.error(404, null, "Course Not found");
-
-    const updatedCourse = await courseModel.findByIdAndUpdate(course_id, edit, {
-      new: true,
-      runValidators: true,
-    });
+    const course = await courseService.editCourseDetails(course_id, edit);
+    if (!course) return res.error(404, "Not found", "Course Not found");
     res.success(200, updatedCourse, "Course edited successfully");
   });
 
@@ -66,15 +61,10 @@ class CourseController {
 
   getAllCourseFolders = asyncHandler(async (req, res) => {
     const { parent_id, course_id } = req.body;
-    let folders;
-    if (parent_id) {
-      folders = await courseFolderModel
-        .find({ parentId, course_id })
-        .populate("thumbnail", "url");
-    }
-    folders = await courseFolderModel
-      .find({ course_id })
-      .populate("thumbnail", "url");
+    const folders = await courseService.getAllCourseFolders(
+      parent_id,
+      course_id,
+    );
     res.success(200, folders, "Course folders fetched successfully");
   });
 
@@ -93,10 +83,7 @@ class CourseController {
 
   getAllCourseContents = asyncHandler(async (req, res) => {
     const { folder_id } = req.body;
-    const contents = await courseContentModel
-      .find({ folder_id })
-      .populate("thumbnail content", "url");
-
+    const contents = await courseService.getAllCourseContents(folder_id);
     res.success(200, contents, "Course contents fetched successfully");
   });
 }

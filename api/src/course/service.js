@@ -1,4 +1,4 @@
-import { getCache, setCache } from "../config/redis.js";
+import { deleteCache, getCache, setCache } from "../config/redis.js";
 import { courseModel } from "./models/course.js";
 import { courseFolderModel } from "./models/folder.js";
 
@@ -50,6 +50,51 @@ class CourseService {
     }
 
     return cachedData;
+  };
+
+  editCourseDetails = async (course_id, edit) => {
+    const course = await courseModel.findById(course_id);
+    if (!course) return null;
+
+    const updatedCourse = await courseModel.findByIdAndUpdate(course_id, edit, {
+      new: true,
+      runValidators: true,
+    });
+    await deleteCache("courses:all");
+    await deleteCache(`course:${course_id}`);
+    return updatedCourse;
+  };
+
+  getAllCourseFolders = async (parent_id, course_id) => {
+    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) return cachedData;
+
+    let folders;
+
+    if (parent_id) {
+      folders = await courseFolderModel
+        .find({ parent_id, course_id })
+        .populate("thumbnail", "url");
+    } else {
+      folders = await courseFolderModel
+        .find({ course_id })
+        .populate("thumbnail", "url");
+    }
+
+    await setCache(cacheKey, folders, 60 * 60);
+    return folders;
+  };
+
+  getAllCourseContents = async (folder_id) => {
+    const cacheKey = `course_contents:${folder_id}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) return cachedData;
+
+    const contents = await courseContentModel
+      .find({ folder_id })
+      .populate("thumbnail content", "url");
+    return contents;
   };
 }
 
