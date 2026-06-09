@@ -23,6 +23,10 @@ const accountSchema = new mongoose.Schema(
       enum: ACCOUNT_ROLES,
       default: "USER",
     },
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );

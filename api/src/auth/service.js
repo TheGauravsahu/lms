@@ -31,6 +31,7 @@ class AuthService {
         account_id: account._id,
         name: account.name,
         role: account.role,
+        version: account.tokenVersion,
       },
       env.JWT_SECRET,
       { expiresIn: "7d" },

@@ -12,6 +12,10 @@ export const verifyToken = asyncHandler(async (req, res, next) => {
   if (!account) {
     return res.error(401, "Unauthorized", "Account not found");
   }
+  if (decoded.version !== account.tokenVersion) {
+    return res.error(401, "Unauthorized", "Token expired");
+  }
+  
   if (account.status === "BLOCKED") {
     return res.error(403, "Forbidden", "Account blocked");
   }
