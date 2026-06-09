@@ -17,6 +17,7 @@ r.put(
 );
 r.post("/course-details", courseController.getCourseDetails);
 r.get("/all-courses", courseController.getAllCourses);
+r.get("/search-course", courseController.searchCourse);
 
 // course_foders routes
 r.post("/create-folder", courseController.createCourseFolder);

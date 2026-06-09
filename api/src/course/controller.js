@@ -1,5 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { courseContentModel, courseFolderModel, courseModel } from "./model.js";
+import { courseModel } from "./models/course.js";
+import { courseFolderModel } from "./models/folder.js";
+import { courseContentModel } from "./models/content.js";
 
 class CourseController {
   createCourse = asyncHandler(async (req, res) => {
@@ -49,6 +51,14 @@ class CourseController {
       runValidators: true,
     });
     res.success(200, updatedCourse, "Course edited successfully");
+  });
+
+  searchCourse = asyncHandler(async (req, res) => {
+    const { q = "" } = req.query;
+    const courses = await courseModel.find({
+      title: { $regex: q, $options: "i" },
+    });
+    res.success(200, courses, "Courses fetched successfully");
   });
 
   // course_folders
