@@ -2,14 +2,18 @@ import express from "express";
 import { courseController } from "./controller.js";
 import { validate } from "../middleware/validate.js";
 import { createCourseSchema, editCourseSchema } from "../schemas/course.js";
+import { verifyRoles, verifyToken } from "../middleware/auth.js";
 
 const r = express.Router();
+r.use(verifyToken);
 
 r.post(
   "/create-course",
+  verifyRoles("ADMIN"),
   validate(createCourseSchema),
   courseController.createCourse,
 );
+
 r.put(
   "/edit-course",
   validate(editCourseSchema),

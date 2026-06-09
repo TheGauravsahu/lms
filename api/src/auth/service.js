@@ -12,7 +12,7 @@ class AuthService {
   };
 
   verifyOtp = async (mobile_no, otp) => {
-    await getCache(`otp:${mobile_no}`);
+    const storedOtp = await getCache(`otp:${mobile_no}`);
     if (!storedOtp) return false;
     return true;
   };

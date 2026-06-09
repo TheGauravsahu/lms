@@ -19,11 +19,21 @@ class AuthController {
     return res.success(200, data, "Account created successfully.");
   });
 
+  logoutAccount = asyncHandler(async (req, res) => {
+    const accountId = req.account.account_id;
+    await accountModel.findByIdAndUpdate(accountId, {
+      $inc: {
+        tokenVersion: 1,
+      },
+    });
+    return res.success(200, null, "Logged out successfully");
+  });
+
   // user_account
   getAccountDetails = asyncHandler(async (req, res) => {
-    const { account_id } = req.body;
+    const account_id = req.body.account_id || req.account.account_id; // admin(boody)/user(req.account)
     const account = await accountModel.findById(account_id);
-    if (!account) return res.error(404, "Unauthorized", "Account not found.");
+    if (!account) return res.error(404, "Not Fund", "Account not found.");
     return res.success(200, account, "Account details fetched successfully.");
   });
 
