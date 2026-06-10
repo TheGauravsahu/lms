@@ -5,7 +5,7 @@ import { createCourseSchema, editCourseSchema } from "../schemas/course.js";
 import { verifyRoles, verifyToken } from "../middleware/auth.js";
 
 const r = express.Router();
-r.use(verifyToken);
+// r.use(verifyToken);
 
 r.post(
   "/create-course",

@@ -8,7 +8,7 @@ class CourseService {
     const cachedCourses = await getCache(cacheKey);
 
     if (!cachedCourses) {
-      const courses = await courseModel.find();
+      const courses = await courseModel.find().populate("thumbnail", "url");
       await setCache(cacheKey, courses, 60 * 60);
       return courses;
     }
