@@ -70,17 +70,13 @@ class CourseService {
     const cachedData = await getCache(cacheKey);
     if (cachedData) return cachedData;
 
-    let folders;
-
-    if (parent_id) {
-      folders = await courseFolderModel
-        .find({ parent_id, course_id })
-        .populate("thumbnail", "url");
-    } else {
-      folders = await courseFolderModel
-        .find({ course_id })
-        .populate("thumbnail", "url");
-    }
+    const query = {
+      course_id,
+      parent_id: parent_id || null,
+    };
+    const folders = await courseFolderModel
+      .find(query)
+      .populate("thumbnail", "url");
 
     await setCache(cacheKey, folders, 60 * 60);
     return folders;

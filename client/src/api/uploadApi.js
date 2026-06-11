@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const uploadApi = {
@@ -16,4 +16,14 @@ export const uploadApi = {
         return data;
       },
     }),
+
+  useRecentUploads: () => {
+    return useQuery({
+      queryKey: ["recent-uplods"],
+      queryFn: async () => {
+        const { data } = await apiClient.get("/uploads/recent-uploads");
+        return data.data;
+      },
+    });
+  },
 };

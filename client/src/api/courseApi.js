@@ -43,10 +43,23 @@ export const courseApi = {
       mutationKey: ["create-folder"],
       onSuccess: (res) => {
         toast.success(res.data.message);
-        navigate("/admin/courses/" + res.data.course_id);
+        navigate("/admin/courses/" + res.data.data.course_id);
       },
       mutationFn: async (data) =>
         await apiClient.post("/courses/create-folder", data),
+    });
+  },
+
+  useAllCourseFolders: (course_id, parent_id) => {
+    return useQuery({
+      queryKey: ["all-folder", course_id, parent_id],
+      queryFn: async () => {
+        const { data } = await apiClient.post("/courses/course-folders", {
+          course_id,
+          parent_id,
+        });
+        return data.data;
+      },
     });
   },
 };
