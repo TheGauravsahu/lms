@@ -34,7 +34,6 @@ const CreateCourseForm = () => {
   });
 
   const onSubmit = async (values) => {
-    console.log(values);
     await mutateAsync(values);
   };
 

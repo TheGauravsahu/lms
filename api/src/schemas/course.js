@@ -26,3 +26,10 @@ export const editCourseSchema = z.object({
     is_featured: z.boolean(),
   }),
 });
+
+export const createCourseFolderSchema = z.object({
+  course_id: z.string().min(1, "course_id is required"),
+  parent_id: z.string().min(1, "parent_id is required").optional(),
+  title: z.string().min(1, "title is required"),
+  thumbnail: z.string().min(1, "thumbnail is required"),
+});

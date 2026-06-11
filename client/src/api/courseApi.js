@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 export const courseApi = {
@@ -21,6 +22,31 @@ export const courseApi = {
         const { data } = await apiClient.get("/courses/all-courses");
         return data.data;
       },
+    });
+  },
+
+  useGetCourseDetails: (course_id) => {
+    return useQuery({
+      queryKey: ["course-details", course_id],
+      queryFn: async () => {
+        const { data } = await apiClient.post("/courses/course-details", {
+          course_id,
+        });
+        return data.data;
+      },
+    });
+  },
+
+  useCreateFolder: () => {
+    const navigate = useNavigate();
+    return useMutation({
+      mutationKey: ["create-folder"],
+      onSuccess: (res) => {
+        toast.success(res.data.message);
+        navigate("/admin/courses/" + res.data.course_id);
+      },
+      mutationFn: async (data) =>
+        await apiClient.post("/courses/create-folder", data),
     });
   },
 };

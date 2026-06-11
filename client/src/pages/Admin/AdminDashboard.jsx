@@ -9,7 +9,7 @@ const AdminDashboard = () => {
   return (
     <div>
       {/* Banner */}
-      <div className="w-full bg-[#EE856D] h-64 rounded-xl flex items-center gap-2 justify-between">
+      <div className="w-full  bg-gradient-to-t  to-primary  h-64 rounded-xl flex items-center gap-2 justify-between">
         <div className="flex flex-col h-full justify-between p-4 py-6">
           <h1 className="text-white font-serif text-5xl">
             Add your courses to get started

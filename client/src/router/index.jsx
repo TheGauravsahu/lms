@@ -3,6 +3,7 @@ import AdminLayout from "@/pages/Admin/AdminLayout";
 import CourseDetails from "@/pages/Admin/Courses/CourseDetails";
 import CreateCourse from "@/pages/Admin/Courses/CreateCourse";
 import MyCourses from "@/pages/Admin/Courses/MyCourses";
+import NewFolder from "@/pages/Admin/Courses/NewFolder";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -25,7 +26,16 @@ export const router = createBrowserRouter([
           },
           {
             path: ":course_id",
-            element: <CourseDetails />,
+            children: [
+              {
+                index: true,
+                element: <CourseDetails />,
+              },
+              {
+                path: "new-folder",
+                element: <NewFolder />,
+              },
+            ],
           },
         ],
       },
