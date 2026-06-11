@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-  (res) => res.data,
+  (res) => res,
   (err) => {
     const msg =
       err.response?.data?.message || err.messsage || "Something went wrong";

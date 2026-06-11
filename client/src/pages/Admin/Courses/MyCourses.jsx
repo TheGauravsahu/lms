@@ -8,31 +8,38 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate } from "@/lib/formatDate";
-import CourseStatus from "./CourseStatus";
+import CourseStatus from "../../../components/admin/courses/course-status";
 import ErrorOccured from "@/components/error-occured";
 import LoadingScreen from "@/components/loading-screen";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const MyCourses = () => {
+  const navigate = useNavigate();
   const { data, isPending, error } = courseApi.useGetAllCourses();
   if (isPending) return <LoadingScreen />;
   if (error) return <ErrorOccured />;
 
   return (
-    <div className="p-8  h-full">
+    <div className="h-full">
       <div>
         <h1 className="tracking-tight font-semibold text-2xl">My Courses</h1>
       </div>
 
-      <div>
+      <div className="flex items-center justify-between">
         {/* header */}
-        <div className="border-b-black border-b-2 pb-2 font-[550] mt-8 w-32">
-          <span>
+        <div className="border-b-black border-b-2 pb-1 font-[550] mt-8 w-32">
+          <span className="flex items-center">
             My Course
-            <span className="ml-1 bg-secondary rounded-full text-xs p-2">
-              12
-            </span>
+            <div className="flex items-center justify-center ml-1 bg-secondary rounded-full text-xs p-1 h-5 w-5">
+              {data.length}
+            </div>
           </span>
         </div>
+        <Button onClick={() => navigate("/admin/courses/create-course")}>
+          <Plus /> New course
+        </Button>
       </div>
 
       {/* table */}
@@ -48,7 +55,10 @@ const MyCourses = () => {
         <TableBody>
           {data.map((c) => (
             <TableRow key={c._id}>
-              <TableCell className="flex items-start gap-8 p-4">
+              <TableCell
+                onClick={() => navigate("/admin/courses/" + c._id)}
+                className="flex items-start gap-8 p-4 cursor-pointer"
+              >
                 <div className="w-42 h-32 overflow-hidden rounded-md">
                   <img
                     src={c.thumbnail.url}

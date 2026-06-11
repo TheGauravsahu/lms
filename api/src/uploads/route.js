@@ -5,7 +5,7 @@ import { uploadController } from "./controller.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const r = express.Router();
-r.use(verifyToken);
+// r.use(verifyToken);
 
 r.post(
   "/upload",

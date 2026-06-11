@@ -9,7 +9,7 @@ const r = express.Router();
 
 r.post(
   "/create-course",
-  verifyRoles("ADMIN"),
+  // verifyRoles("ADMIN"),
   validate(createCourseSchema),
   courseController.createCourse,
 );

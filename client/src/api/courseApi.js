@@ -1,11 +1,15 @@
 import { apiClient } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const courseApi = {
-  useCreateCourse: (data) => {
+  useCreateCourse: () => {
     return useMutation({
       mutationKey: ["create-course"],
-      mutationFn: async () =>
+      onSuccess: (res) => {
+        toast.success(res.data.message);
+      },
+      mutationFn: async (data) =>
         await apiClient.post("/courses/create-course", data),
     });
   },
@@ -14,8 +18,8 @@ export const courseApi = {
     return useQuery({
       queryKey: ["all-courses"],
       queryFn: async () => {
-        const res = await apiClient.get("/courses/all-courses");
-        return res.data;
+        const { data } = await apiClient.get("/courses/all-courses");
+        return data.data;
       },
     });
   },

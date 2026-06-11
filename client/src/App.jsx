@@ -1,7 +1,8 @@
-import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
+import { RouterProvider } from "react-router";
+import { router } from "./router";
 
 const App = () => {
-  return <AdminDashboard />;
+  return <RouterProvider router={router} />;
 };
 
 export default App;
