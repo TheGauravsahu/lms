@@ -52,7 +52,7 @@ export const courseApi = {
 
   useAllCourseFolders: (course_id, parent_id) => {
     return useQuery({
-      queryKey: ["all-folder", course_id, parent_id],
+      queryKey: ["all-folders", course_id, parent_id],
       queryFn: async () => {
         const { data } = await apiClient.post("/courses/course-folders", {
           course_id,
@@ -60,6 +60,29 @@ export const courseApi = {
         });
         return data.data;
       },
+    });
+  },
+
+  useGetAllCourseContents: (folder_id) => {
+    return useQuery({
+      queryKey: ["all-contents", folder_id],
+      queryFn: async () => {
+        const { data } = await apiClient.post("/courses/course-contents", {
+          folder_id,
+        });
+        return data.data;
+      },
+    });
+  },
+
+  useCreateContent: () => {
+    return useMutation({
+      mutationKey: ["create-content"],
+      onSuccess: (res) => {
+        toast.success(res.data.message);
+      },
+      mutationFn: async (data) =>
+        await apiClient.post("/courses/create-content", data),
     });
   },
 };

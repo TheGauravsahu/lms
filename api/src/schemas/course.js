@@ -1,4 +1,4 @@
-import { COURSE_STATUS } from "../utils/constants.js";
+import { CONTENT_TYPE, COURSE_STATUS } from "../utils/constants.js";
 import z from "zod";
 
 export const createCourseSchema = z.object({
@@ -32,4 +32,12 @@ export const createCourseFolderSchema = z.object({
   parent_id: z.string().min(1, "parent_id is required").optional(),
   title: z.string().min(1, "title is required"),
   thumbnail: z.string().min(1, "thumbnail is required"),
+});
+
+export const createCourseContentSchema = z.object({
+  folder_id: z.string().min(1, "course_id is required"),
+  title: z.string().min(1, "title is required"),
+  thumbnail: z.string().min(1, "thumbnail is required").optional(),
+  content: z.string().min(1, "thumbnail is required"),
+  content_type: z.enum(CONTENT_TYPE),
 });

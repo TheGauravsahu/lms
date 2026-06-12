@@ -1,4 +1,5 @@
 import { deleteCache, getCache, setCache } from "../config/redis.js";
+import { courseContentModel } from "./models/content.js";
 import { courseModel } from "./models/course.js";
 import { courseFolderModel } from "./models/folder.js";
 

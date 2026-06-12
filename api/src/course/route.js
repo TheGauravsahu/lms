@@ -2,6 +2,7 @@ import express from "express";
 import { courseController } from "./controller.js";
 import { validate } from "../middleware/validate.js";
 import {
+  createCourseContentSchema,
   createCourseFolderSchema,
   createCourseSchema,
   editCourseSchema,
@@ -36,7 +37,11 @@ r.post(
 r.post("/course-folders", courseController.getAllCourseFolders);
 
 // course_content routes
-r.post("/create-content", courseController.createCourseContent);
+r.post(
+  "/create-content",
+  validate(createCourseContentSchema),
+  courseController.createCourseContent,
+);
 r.post("/course-contents", courseController.getAllCourseContents);
 
 export default r;

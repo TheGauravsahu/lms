@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 
-const CourseFolderDetails = () => {
+const FolderDetails = () => {
   const navigate = useNavigate();
   const { course_id, folder_id } = useParams();
   const { data, isPending, isError } = courseApi.useAllCourseFolders(
@@ -76,7 +76,11 @@ const CourseFolderDetails = () => {
               variant="ghost"
               className="cursor-pointer"
               onClick={() =>
-                navigate(`/admin/courses/${course_id}/folders/${c._id}`)
+                data.parent_id === null
+                  ? navigate(`/admin/courses/${course_id}/folders/${c._id}`)
+                  : navigate(
+                      `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                    )
               }
             >
               <ChevronRight />
@@ -88,4 +92,4 @@ const CourseFolderDetails = () => {
   );
 };
 
-export default CourseFolderDetails;
+export default FolderDetails;
