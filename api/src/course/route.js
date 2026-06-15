@@ -62,7 +62,7 @@ r.put(
   validate(editCourseContentSchema),
   courseController.editCourseContent,
 );
-r.delete(
+r.post(
   "/delete-content",
   validate(deleteCourseContentSchema),
   courseController.deleteCourseContent,

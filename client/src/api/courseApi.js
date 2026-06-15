@@ -96,4 +96,15 @@ export const courseApi = {
         await apiClient.put("/courses/edit-content", data),
     });
   },
+
+  useDeleteContent: () => {
+    return useMutation({
+      mutationKey: ["delete-content"],
+      onSuccess: (res) => {
+        toast.success(res.data.message);
+      },
+      mutationFn: async (data) =>
+        await apiClient.post("/courses/delete-content", data),
+    });
+  },
 };

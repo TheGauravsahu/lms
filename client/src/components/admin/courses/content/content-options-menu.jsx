@@ -33,7 +33,7 @@ const ContentOptionsMenu = ({ children,prevContent }) => {
       </ContextMenu>
 
       <EditContent open={openEdit} onOpenChange={setOpenEdit} prevContent={prevContent} />
-      <DeleteContent open={openDelete} onOpenChange={setOpenDelete} />
+      <DeleteContent open={openDelete} onOpenChange={setOpenDelete} folder_id={prevContent.folder_id} />
     </>
   );
 };

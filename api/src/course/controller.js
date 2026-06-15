@@ -77,7 +77,7 @@ class CourseController {
     const { course_id, parent_id } = req.body;
     const result = await courseService.deleteCourseFolder(course_id, parent_id);
     if (!result) return res.error(404, "Not Found", "Course Folder not found.");
-    res.success(204, null, "Course folder deleted successfully");
+    res.success(200, null, "Course folder deleted successfully");
   });
 
   // course_content
@@ -102,7 +102,7 @@ class CourseController {
   deleteCourseContent = asyncHandler(async (req, res) => {
     const result = await courseService.deleteCourseContent(req.body.folder_id);
     if (!result) return res.error(404, "Not Found", "Course content not found");
-    return res.success(204, null, "Course content deleted successfully.");
+    return res.success(200, null, "Course content deleted successfully.");
   });
 }
 
