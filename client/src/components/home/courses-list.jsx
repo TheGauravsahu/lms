@@ -1,0 +1,56 @@
+import { courseApi } from "@/api/courseApi";
+import LoadingScreen from "../loading-screen";
+import ErrorOccured from "../error-occured";
+import { Button } from "../ui/button";
+import { ArrowRight } from "lucide-react";
+
+const CoursesList = () => {
+  const { isPending, isError, data } = courseApi.useGetAllCourses();
+
+  if (isPending) return <LoadingScreen />;
+  if (isError) return <ErrorOccured />;
+
+  return (
+    <div className="w-full p-8 mt-12">
+      <h1 className="text-2xl font-semibold text-center my-4">Our Courses</h1>
+
+      <div className="flex items-center justify-center flex-wrap gap-8 mt-6">
+        {data.map((c) => (
+          <div
+            className="rounded-sm bg-linear-to-t from-gray-100 to-orange-600 h-70 w-64 border"
+            key={c._id}
+          >
+            <div className="overflow-hidden w-full h-[60%] rounded-t-sm">
+              <img
+                src={c.thumbnail.url}
+                alt={c.title}
+                className="object-cover scale-95 "
+              />
+            </div>
+
+            <div className="p-2">
+              <h2 className="font-semibold">{c.title}</h2>
+              <div className="flex justify-between">
+                <h3 className="font-semibold flex items-center gap-1">
+                  ₹{c.offer_price}{" "}
+                  <span className="line-through font-medium">
+                    {c.original_price}
+                  </span>
+                </h3>
+
+                <span className="bg-amber-400 text-white font-semibold  rounded-lg w-12 h-6 text-sm flex items-center justify-center">
+                  New
+                </span>
+              </div>
+              <Button className="w-full my-3 cursor-pointer">
+                Buy Now <ArrowRight />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CoursesList;

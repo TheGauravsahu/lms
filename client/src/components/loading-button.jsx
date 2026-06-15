@@ -3,9 +3,9 @@ import { Button } from "./ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 
-const LoadingButton = ({ isPending, children, loadingText, type , onClick }) => {
+const LoadingButton = ({ isPending, children, loadingText, type , onClick,className }) => {
   return (
-    <Button paused={isPending} type={type || "submit"} onClick={onClick}>
+    <Button paused={isPending} type={type || "submit"} onClick={onClick} className={className}>
       {isPending ? (
         <span className="flex items-center gap-1 cursor-loading">
           <Loader2 className="animate-spin" />

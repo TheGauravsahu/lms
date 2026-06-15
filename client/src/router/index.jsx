@@ -9,8 +9,15 @@ import { createBrowserRouter } from "react-router";
 import ContentDetails from "@/pages/Admin/Courses/Content/ContentDetails";
 import FolderDetails from "@/pages/Admin/Courses/Folder/FolderDetails";
 import NewContent from "@/pages/Admin/Courses/Content/NewContent";
+import HomePage from "@/pages/Home/HomePage";
 
 export const router = createBrowserRouter([
+  // user_ui
+  {
+    path: "/",
+    children: [{ index: true, element: <HomePage /> }],
+  },
+
   // admin_ui
   {
     path: "/admin",
