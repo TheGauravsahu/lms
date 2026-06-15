@@ -48,14 +48,7 @@ class CourseController {
 
   // course_folders
   createCourseFolder = asyncHandler(async (req, res) => {
-    const { course_id, parent_id, title, thumbnail } = req.body;
-
-    const folder = await courseFolderModel.create({
-      course_id,
-      parent_id,
-      title,
-      thumbnail,
-    });
+    const folder = await courseService.createCourseFolder(req.body);
     res.success(201, folder, "Course folder created successfully");
   });
 
@@ -68,16 +61,28 @@ class CourseController {
     res.success(200, folders, "Course folders fetched successfully");
   });
 
+  editCourseFolder = asyncHandler(async (req, res) => {
+    const { course_id, parent_id, title, thumbnail } = req.body;
+    const folder = await courseService.editCourseFolder(
+      course_id,
+      parent_id,
+      title,
+      thumbnail,
+    );
+    if (!folder) return res.error(404, "Not Found", "Course Folder not found.");
+    res.success(200, folder, "Course folder edited successfully");
+  });
+
+  deleteCourseFolder = asyncHandler(async (req, res) => {
+    const { course_id, parent_id } = req.body;
+    const result = await courseService.deleteCourseFolder(course_id, parent_id);
+    if (!result) return res.error(404, "Not Found", "Course Folder not found.");
+    res.success(204, null, "Course folder deleted successfully");
+  });
+
   // course_content
   createCourseContent = asyncHandler(async (req, res) => {
-    const { folder_id, title, content_type, thumbnail, content } = req.body;
-    const data = await courseContentModel.create({
-      folder_id,
-      title,
-      content_type,
-      content,
-    });
-
+    const data = await courseService.createCourseContent(req.body);
     res.success(201, data, "Course content created successfully");
   });
 
@@ -85,6 +90,19 @@ class CourseController {
     const { folder_id } = req.body;
     const contents = await courseService.getAllCourseContents(folder_id);
     res.success(200, contents, "Course contents fetched successfully");
+  });
+
+  editCourseContent = asyncHandler(async (req, res) => {
+    const content = await courseService.editCourseContent(req.body);
+    if (!content)
+      return res.error(404, "Not Found", "Course content not found");
+    return res.success(200, content, "Course content edited successfully.");
+  });
+
+  deleteCourseContent = asyncHandler(async (req, res) => {
+    const result = await courseService.deleteCourseContent(req.body.folder_id);
+    if (!result) return res.error(404, "Not Found", "Course content not found");
+    return res.success(204, null, "Course content deleted successfully.");
   });
 }
 

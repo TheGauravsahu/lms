@@ -5,6 +5,10 @@ import {
   createCourseContentSchema,
   createCourseFolderSchema,
   createCourseSchema,
+  deleteCourseContentSchema,
+  deleteCourseFolderSchema,
+  editCourseContentSchema,
+  editCourseFolderSchema,
   editCourseSchema,
 } from "../schemas/course.js";
 import { verifyRoles, verifyToken } from "../middleware/auth.js";
@@ -29,19 +33,39 @@ r.get("/all-courses", courseController.getAllCourses);
 r.get("/search-course", courseController.searchCourse);
 
 // course_foders routes
+r.post("/course-folders", courseController.getAllCourseFolders);
 r.post(
   "/create-folder",
   validate(createCourseFolderSchema),
   courseController.createCourseFolder,
 );
-r.post("/course-folders", courseController.getAllCourseFolders);
+r.put(
+  "/edit-folder",
+  validate(editCourseFolderSchema),
+  courseController.editCourseFolder,
+);
+r.delete(
+  "/delete-folder",
+  validate(deleteCourseFolderSchema),
+  courseController.deleteCourseFolder,
+);
 
 // course_content routes
+r.post("/course-contents", courseController.getAllCourseContents);
 r.post(
   "/create-content",
   validate(createCourseContentSchema),
   courseController.createCourseContent,
 );
-r.post("/course-contents", courseController.getAllCourseContents);
+r.put(
+  "/edit-content",
+  validate(editCourseContentSchema),
+  courseController.editCourseContent,
+);
+r.delete(
+  "/delete-content",
+  validate(deleteCourseContentSchema),
+  courseController.deleteCourseContent,
+);
 
 export default r;

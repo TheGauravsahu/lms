@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
+import ContentOptionsMenu from "../../../../components/admin/courses/content/content-options-menu";
 
 const ContentDetails = () => {
   const navigate = useNavigate();
@@ -74,24 +75,30 @@ const ContentDetails = () => {
         {data.map((c) => (
           <div
             key={c._id}
-            className="bg-gradient-to-l from-gray-200  h-18 border w-[30%] rounded-lg p-2 flex justify-between items-center"
+            className="bg-gradient-to-l from-gray-200  h-18 border w-[30%] rounded-lg p-2"
           >
-            <div className="flex gap-2 items-center">
-              <div className="w-24 h-14 overflow-hidden rounded-sm">
-                <img
-                  src={c.thumbnail ? c.thumbnail.url: "/course_banner_bg.png"}
-                  alt={c.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <span className="font-semibold">{c.title}</span>
-            </div>
+            <ContentOptionsMenu prevContent={c}>
+              <div className=" flex justify-between items-center">
+                <div className="flex gap-2 items-center">
+                  <div className="w-24 h-14 overflow-hidden rounded-sm">
+                    <img
+                      src={
+                        c.thumbnail ? c.thumbnail.url : "/course_banner_bg.png"
+                      }
+                      alt={c.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <span className="font-semibold">{c.title}</span>
+                </div>
 
-            <Button variant="ghost" className="cursor-pointer">
-              <a href={c.content.url || ""} target="_blank">
-                <ChevronRight />
-              </a>
-            </Button>
+                <Button variant="ghost" className="cursor-pointer">
+                  <a href={c.content.url || ""} target="_blank">
+                    <ChevronRight />
+                  </a>
+                </Button>
+              </div>
+            </ContentOptionsMenu>
           </div>
         ))}
       </section>

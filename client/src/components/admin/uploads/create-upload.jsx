@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
-const CreateUpload = ({ onChange, className }) => {
+const CreateUpload = ({ onChange, className, value }) => {
   const [preview, setPreview] = useState(false);
   const { mutateAsync, isPending } = uploadApi.useUpload();
 
@@ -34,7 +34,7 @@ const CreateUpload = ({ onChange, className }) => {
     onChange(null);
   };
 
-  if (preview) {
+  if (preview || value) {
     return (
       <div
         className={cn(

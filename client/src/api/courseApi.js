@@ -85,4 +85,15 @@ export const courseApi = {
         await apiClient.post("/courses/create-content", data),
     });
   },
+
+  useEditContent: () => {
+    return useMutation({
+      mutationKey: ["edit-content"],
+      onSuccess: (res) => {
+        toast.success(res.data.message);
+      },
+      mutationFn: async (data) =>
+        await apiClient.put("/courses/edit-content", data),
+    });
+  },
 };

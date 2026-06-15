@@ -66,6 +66,7 @@ class CourseService {
     return updatedCourse;
   };
 
+  // course_folder
   getAllCourseFolders = async (parent_id, course_id) => {
     const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
     const cachedData = await getCache(cacheKey);
@@ -83,6 +84,49 @@ class CourseService {
     return folders;
   };
 
+  createCourseFolder = async ({ course_id, parent_id, title, thumbnail }) => {
+    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
+    const folder = await courseFolderModel.create({
+      course_id,
+      parent_id,
+      title,
+      thumbnail,
+    });
+    await deleteCache(cacheKey);
+    return folder;
+  };
+
+  editCourseFolder = async (course_id, parent_id, title, thumbnail) => {
+    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
+    const folder = await courseFolderModel.findOne({
+      course_id,
+      parent_id,
+    });
+    if (!folder) return null;
+
+    const updatedFolder = await courseFolderModel.findByIdAndUpdate(
+      folder._id,
+      { title, thumbnail },
+      { new: true, runValidators: true },
+    );
+    await deleteCache(cacheKey);
+    return updatedFolder;
+  };
+
+  deleteCourseFolder = async (course_id, parent_id) => {
+    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
+    const folder = await courseFolderModel.findOne({
+      course_id,
+      parent_id,
+    });
+    if (!folder) return false;
+
+    await courseFolderModel.findByIdAndDelete(folder._id);
+    await deleteCache(cacheKey);
+    return true;
+  };
+
+  // course_content
   getAllCourseContents = async (folder_id) => {
     const cacheKey = `course_contents:${folder_id}`;
     const cachedData = await getCache(cacheKey);
@@ -92,6 +136,54 @@ class CourseService {
       .find({ folder_id })
       .populate("thumbnail content", "url");
     return contents;
+  };
+
+  createCourseContent = async ({
+    folder_id,
+    title,
+    content_type,
+    thumbnail,
+    content,
+  }) => {
+    const cacheKey = `course_contents:${folder_id}`;
+    const data = await courseContentModel.create({
+      folder_id,
+      title,
+      content_type,
+      content,
+    });
+    await deleteCache(cacheKey);
+    return data;
+  };
+
+  editCourseContent = async ({
+    folder_id,
+    title,
+    content_type,
+    thumbnail,
+    content,
+  }) => {
+    const cacheKey = `course_contents:${folder_id}`;
+    const course_content = await courseContentModel.findOne({ folder_id });
+    if (!course_content) return null;
+
+    const updatedCourseContent = await courseContentModel.findByIdAndUpdate(
+      course_content._id,
+      { title, content_type, thumbnail, content },
+      { new: true, runValidators: true },
+    );
+
+    await deleteCache(cacheKey);
+    return updatedCourseContent;
+  };
+
+  deleteCourseContent = async (folder_id) => {
+    const cacheKey = `course_contents:${folder_id}`;
+    const content = await courseContentModel.findOne({ folder_id });
+    if (!content) return false;
+    await courseContentModel.findByIdAndDelete(content._id);
+    await deleteCache(cacheKey);
+    return true;
   };
 }
 
