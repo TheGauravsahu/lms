@@ -1,10 +1,16 @@
+import { purchaseApi } from "@/api/purchaseApi";
+import PurchaseModel from "@/components/purchase/purchase-model";
+import { buttonVariants } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatDate";
+import { Sparkle } from "lucide-react";
 import { useLocation } from "react-router";
 // import { useState } from "react";
 
 const CourseBanner = ({ data }) => {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const { data: isPurchased } = purchaseApi.useCheckPurchase(data.overview._id);
+
   //   const banners = ["/course_banner_bg_v2.png", "/course_banner_bg.png"];
   //   const [bannerSrc] = useState(() => {
   //     return banners[Math.floor(Math.random() * banners.length)];
@@ -29,6 +35,7 @@ const CourseBanner = ({ data }) => {
           {isAdmin && (
             <h3 className="text-sm">Status: {data.overview.status}</h3>
           )}
+
           <div className="flex mt-3">
             <h2 className="font-semibold text-4xl">
               ₹{data.overview.offer_price}
@@ -37,6 +44,21 @@ const CourseBanner = ({ data }) => {
               {data.overview.original_price}
             </h2>
           </div>
+
+          {!isAdmin && (
+            <>
+              {isPurchased ? (
+                <div
+                  className={`${buttonVariants({ variant: "ghost" })} text-orange-600 bg-orange-100 hover:bg-orange-100 hover:text-orange-600 rounded-sm w-full my-2 cursor-pointer`}
+                >
+                  <Sparkle />
+                  Purchased
+                </div>
+              ) : (
+                <PurchaseModel course={data.overview} />
+              )}
+            </>
+          )}
         </div>
 
         <div className="">

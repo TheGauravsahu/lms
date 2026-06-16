@@ -12,10 +12,15 @@ r.post(
   validate(purchaseCourseSchema),
   purchaseController.purchaseCourse,
 );
-r.post(
+r.get(
   "/my-purchases",
   validate(purchaseCourseSchema),
   purchaseController.getCurrenUserPurchases,
+);
+r.get(
+  "/my-purchased-courses",
+  validate(purchaseCourseSchema),
+  purchaseController.getCurrenUserPurchasedCourses,
 );
 r.post(
   "/check-purchase",

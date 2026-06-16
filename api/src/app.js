@@ -21,7 +21,7 @@ app.use(responseMiddleware);
 app.use("/api/courses", courseRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/purchcases", purchaseRoutes);
+app.use("/api/purchases", purchaseRoutes);
 
 app.get("/health", (req, res) =>
   res.success(200, null, "Server is running successfully."),

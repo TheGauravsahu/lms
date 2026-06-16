@@ -57,7 +57,7 @@ class PurchaseController {
     const purchase = await purchaseModel.findOne({ account_id, course_id });
     res.success(
       200,
-      { purchased: !!purchase },
+      { isPurchased: !!purchase },
       "Purchase checked successfully.",
     );
   });
@@ -67,6 +67,19 @@ class PurchaseController {
     const purchase = await purchaseModel.findOne({ account_id, course_id });
     if (!purchase) return res.error(404, "Not Found", "Purchase not found.");
     res.success(200, purchase, "Purchase checked successfully.");
+  });
+
+  getCurrenUserPurchasedCourses = asyncHandler(async (req, res) => {
+    const { account_id } = req.account;
+    const purchases = await purchaseModel.find({ account_id }).populate({
+      path: "course_id",
+      populate: {
+        path: "thumbnail",
+        select: "url",
+      },
+    });
+    const courses = purchases.map((p) => p.course_id);
+    res.success(200, courses, "Purchases fetched successfully.");
   });
 
   getAllPurchases = asyncHandler(async (req, res) => {

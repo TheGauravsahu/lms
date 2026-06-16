@@ -75,8 +75,11 @@ const CoursesList = () => {
                   New
                 </span>
               </div>
-              <Button className="w-full my-3 cursor-pointer">
-                Buy Now <ArrowRight />
+              <Button
+                onClick={() => navigate("/all-courses/" + c._id)}
+                className="w-full my-3 cursor-pointer"
+              >
+                Explore <ArrowRight />
               </Button>
             </div>
           </div>
