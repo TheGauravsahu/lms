@@ -1,11 +1,14 @@
 import { formatDate } from "@/lib/formatDate";
+import { useLocation } from "react-router";
 // import { useState } from "react";
 
 const CourseBanner = ({ data }) => {
-//   const banners = ["/course_banner_bg_v2.png", "/course_banner_bg.png"];
-//   const [bannerSrc] = useState(() => {
-//     return banners[Math.floor(Math.random() * banners.length)];
-//   });
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+  //   const banners = ["/course_banner_bg_v2.png", "/course_banner_bg.png"];
+  //   const [bannerSrc] = useState(() => {
+  //     return banners[Math.floor(Math.random() * banners.length)];
+  //   });
 
   return (
     <div className="relative h-52 w-full border rounded-lg my-4">
@@ -23,7 +26,9 @@ const CourseBanner = ({ data }) => {
           <h3 className="text-sm mt-3">
             Created: {formatDate(data.overview.createdAt)}
           </h3>
-          <h3 className="text-sm">Status: {data.overview.status}</h3>
+          {isAdmin && (
+            <h3 className="text-sm">Status: {data.overview.status}</h3>
+          )}
           <div className="flex mt-3">
             <h2 className="font-semibold text-4xl">
               ₹{data.overview.offer_price}

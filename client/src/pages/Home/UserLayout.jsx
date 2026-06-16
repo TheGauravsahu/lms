@@ -14,7 +14,7 @@ const UserLayout = () => {
     <SidebarProvider>
       <UserSidebar />
       <main className="w-full">
-        <nav className="w-full flex items-center justify-between px-4 sticky top-0 right-0 bg-background">
+        <nav className="w-full flex items-center justify-between px-4 sticky top-0 right-0 bg-background z-99">
           <SidebarTrigger />
           <div className="flex items-center gap-4">
             <CommandMenu />
@@ -30,7 +30,7 @@ const UserLayout = () => {
             )}
           </div>
         </nav>
-        <div className="p-8">
+        <div className="p-8 pr-2">
           <Outlet />
         </div>
       </main>

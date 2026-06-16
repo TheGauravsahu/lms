@@ -88,9 +88,9 @@ const FolderDetails = () => {
                         `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
                       )
                   : data.parent_id === null
-                    ? navigate(`/courses/${course_id}/folders/${c._id}`)
+                    ? navigate(`/all-courses/${course_id}/folders/${c._id}`)
                     : navigate(
-                        `/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                        `/all-courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
                       )
               }
             >

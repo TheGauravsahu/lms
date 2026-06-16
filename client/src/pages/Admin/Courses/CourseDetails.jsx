@@ -68,7 +68,7 @@ const CourseDetails = () => {
                 navigate(
                   isAdmin
                     ? `/admin/courses/${course_id}/folders/${c._id}`
-                    : `/courses/${course_id}/folders/${c._id}`,
+                    : `/all-courses/${course_id}/folders/${c._id}`,
                 )
               }
             >

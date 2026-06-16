@@ -11,6 +11,7 @@ import FolderDetails from "@/pages/Admin/Courses/Folder/FolderDetails";
 import NewContent from "@/pages/Admin/Courses/Content/NewContent";
 import HomePage from "@/pages/Home/HomePage";
 import UserLayout from "@/pages/Home/UserLayout";
+import CoursesList from "@/components/home/courses-list";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
         path: "all-courses",
         element: <UserLayout />,
         children: [
+          { index: true, element: <CoursesList /> },
           {
             path: ":course_id",
             element: <CourseDetailsLayout />,

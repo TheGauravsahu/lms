@@ -3,13 +3,18 @@ import ErrorOccured from "../error-occured";
 import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { useLocation, useNavigate } from "react-router";
 
 const CoursesList = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   const { isPending, isError, data } = courseApi.useGetAllCourses();
 
   if (isPending)
     return (
-      <div className="w-full p-8 mt-12">
+      <div className="w-full ">
         <h1 className="text-2xl font-semibold text-center my-4">Our Courses</h1>
 
         <div className="flex items-center justify-center flex-wrap gap-8 mt-6">
@@ -32,16 +37,23 @@ const CoursesList = () => {
   if (isError) return <ErrorOccured />;
 
   return (
-    <div className="w-full p-8 mt-12">
-      <h1 className="text-2xl font-semibold text-center my-4">Our Courses</h1>
+    <div className={`w-full${isHome && "pt-12"}`}>
+      <h1 className={`text-2xl font-semibold my-4 ${isHome && "text-center"}`}>
+        Our Courses
+      </h1>
 
-      <div className="flex items-center justify-center flex-wrap gap-8 mt-6">
+      <div
+        className={`flex items-center  flex-wrap gap-6 mt-6 ${isHome && "justify-center"}`}
+      >
         {data.map((c) => (
           <div
-            className="rounded-sm bg-linear-to-t from-gray-100 to-orange-600 h-70 w-64 border"
+            className={`rounded-sm bg-linear-to-t from-gray-100 to-orange-600  border h-70 ${isHome ? "w-64 " : "w-60"} overflow-hidden`}
             key={c._id}
           >
-            <div className="overflow-hidden w-full h-[60%] rounded-t-sm">
+            <div
+              onClick={() => navigate("/all-courses/" + c._id)}
+              className="overflow-hidden w-full h-[60%] rounded-t-sm cursor-pointer"
+            >
               <img
                 src={c.thumbnail.url}
                 alt={c.title}
