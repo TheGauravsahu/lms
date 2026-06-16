@@ -13,9 +13,8 @@ import { User2 } from "lucide-react";
 import { FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router";
 
-const UserDropdown = () => {
+const UserDropdown = ({ user }) => {
   const navigate = useNavigate();
-  const user = useAuthStore.getState().user;
   const logout = useAuthStore.getState().logout;
 
   return (

@@ -19,7 +19,20 @@ class AuthService {
 
   createAccountAndSignToken = async (name, mobile_no) => {
     const accountFound = await accountModel.findOne({ mobile_no });
-    if (accountFound) return null;
+    if (accountFound)
+      return {
+        token: jwt.sign(
+          {
+            account_id: accountFound._id,
+            name: accountFound.name,
+            role: accountFound.role,
+            version: accountFound.tokenVersion,
+          },
+          env.JWT_SECRET,
+          { expiresIn: "7d" },
+        ),
+        account: accountFound,
+      };
 
     const account = await accountModel.create({
       name,

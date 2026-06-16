@@ -10,7 +10,7 @@ import { useNavigate } from "react-router";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const token = useAuthStore.getState().token;
+  const user = useAuthStore.getState().user;
 
   return (
     <div>
@@ -30,14 +30,14 @@ const HomePage = () => {
 
         <nav className="flex items-center gap-4">
           <h2
-            onClick={() => navigate("/courses")}
+            onClick={() => navigate("/all-courses")}
             className="text-sm cursor-pointer"
           >
             Courses
           </h2>
 
-          {token ? (
-            <UserDropdown />
+          {user ? (
+            <UserDropdown user={user} />
           ) : (
             <LoginModal>
               <Button className="bg-linear-to-b from-orange-300 to-red-500 cursor-pointer rounded-sm">

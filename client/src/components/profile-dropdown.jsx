@@ -16,7 +16,7 @@ import { Folder } from "lucide-react";
 
 const ProfileDropdown = () => {
   // const navigate = useNavigate();
-  const user = useAuthStore.getState().user;
+   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore.getState().logout;
 
   return (

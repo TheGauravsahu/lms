@@ -10,12 +10,48 @@ import ContentDetails from "@/pages/Admin/Courses/Content/ContentDetails";
 import FolderDetails from "@/pages/Admin/Courses/Folder/FolderDetails";
 import NewContent from "@/pages/Admin/Courses/Content/NewContent";
 import HomePage from "@/pages/Home/HomePage";
+import UserLayout from "@/pages/Home/UserLayout";
 
 export const router = createBrowserRouter([
   // user_ui
   {
     path: "/",
-    children: [{ index: true, element: <HomePage /> }],
+    children: [
+      { index: true, element: <HomePage /> },
+      {
+        path: "all-courses",
+        element: <UserLayout />,
+        children: [
+          {
+            path: ":course_id",
+            element: <CourseDetailsLayout />,
+            children: [
+              {
+                index: true,
+                element: <CourseDetails />,
+              },
+              {
+                path: "folders",
+                children: [
+                  {
+                    index: true,
+                    element: <CourseDetails />,
+                  },
+                  {
+                    path: ":folder_id",
+                    element: <FolderDetails />,
+                  },
+                ],
+              },
+              {
+                path: "contents",
+                element: <ContentDetails />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
 
   // admin_ui

@@ -3,10 +3,13 @@ import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 const FolderDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   const { course_id, folder_id } = useParams();
   const { data, isPending, isError } = courseApi.useAllCourseFolders(
     course_id,
@@ -43,16 +46,18 @@ const FolderDetails = () => {
             </span>
           </div>
         </div>
-        <Button
-          className="cursor-pointer"
-          onClick={() =>
-            navigate(
-              `/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`,
-            )
-          }
-        >
-          <Plus /> New Folder
-        </Button>
+        {isAdmin && (
+          <Button
+            className="cursor-pointer"
+            onClick={() =>
+              navigate(
+                `/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`,
+              )
+            }
+          >
+            <Plus /> New Folder
+          </Button>
+        )}
       </div>
 
       <section className="flex gap-8 items-start  py-4">
@@ -76,11 +81,17 @@ const FolderDetails = () => {
               variant="ghost"
               className="cursor-pointer"
               onClick={() =>
-                data.parent_id === null
-                  ? navigate(`/admin/courses/${course_id}/folders/${c._id}`)
-                  : navigate(
-                      `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
-                    )
+                isAdmin
+                  ? data.parent_id === null
+                    ? navigate(`/admin/courses/${course_id}/folders/${c._id}`)
+                    : navigate(
+                        `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                      )
+                  : data.parent_id === null
+                    ? navigate(`/courses/${course_id}/folders/${c._id}`)
+                    : navigate(
+                        `/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                      )
               }
             >
               <ChevronRight />

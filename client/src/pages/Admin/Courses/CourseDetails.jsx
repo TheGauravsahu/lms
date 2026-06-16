@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { courseApi } from "@/api/courseApi";
 import LoadingScreen from "@/components/loading-screen";
 import ErrorOccured from "@/components/error-occured";
@@ -7,6 +7,8 @@ import { Plus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 
 const CourseDetails = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
   const navigate = useNavigate();
   const { course_id } = useParams();
   const { data, isPending, isError } = courseApi.useGetCourseDetails(course_id);
@@ -29,14 +31,16 @@ const CourseDetails = () => {
             </span>
           </div>
         </div>
-        <Button
-          className="cursor-pointer"
-          onClick={() =>
-            navigate(`/admin/courses/${course_id}/folders/new-folder`)
-          }
-        >
-          <Plus /> New Folder
-        </Button>
+        {isAdmin && (
+          <Button
+            className="cursor-pointer"
+            onClick={() =>
+              navigate(`/admin/courses/${course_id}/folders/new-folder`)
+            }
+          >
+            <Plus /> New Folder
+          </Button>
+        )}
       </div>
 
       {/* content section */}
@@ -61,7 +65,11 @@ const CourseDetails = () => {
               variant="ghost"
               className="cursor-pointer"
               onClick={() =>
-                navigate(`/admin/courses/${course_id}/folders/${c._id}`)
+                navigate(
+                  isAdmin
+                    ? `/admin/courses/${course_id}/folders/${c._id}`
+                    : `/courses/${course_id}/folders/${c._id}`,
+                )
               }
             >
               <ChevronRight />

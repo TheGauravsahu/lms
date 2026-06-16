@@ -14,9 +14,7 @@ class AuthController {
     if (!result) return res.error(401, "Unauthorized", "Invalid OTP.");
 
     const data = await authService.createAccountAndSignToken(name, mobile_no);
-    if (!data)
-      return res.error(400, "Account Found", "Account already exists.");
-    return res.success(200, data, "Account created successfully.");
+    return res.success(200, data, "Logged in successfully.");
   });
 
   logoutAccount = asyncHandler(async (req, res) => {

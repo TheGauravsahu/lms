@@ -3,10 +3,17 @@ import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
-import ContentOptionsMenu from "../../../../components/admin/courses/content/content-options-menu";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router";
+import ContentOptionsMenu from "@/components/admin/courses/content/content-options-menu";
 
 const ContentDetails = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const parent = searchParams.get("parent");
@@ -46,29 +53,31 @@ const ContentDetails = () => {
             </span>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            onClick={() =>
-              navigate(
-                `/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`,
-              )
-            }
-          >
-            <Plus /> New Folder
-          </Button>
-          <Button
-            className="cursor-pointer"
-            onClick={() =>
-              navigate(
-                `/admin/courses/${course_id}/contents/new-content?folder_id=${folder_id}`,
-              )
-            }
-          >
-            <Plus /> New {parent}
-          </Button>
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() =>
+                navigate(
+                  `/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`,
+                )
+              }
+            >
+              <Plus /> New Folder
+            </Button>
+            <Button
+              className="cursor-pointer"
+              onClick={() =>
+                navigate(
+                  `/admin/courses/${course_id}/contents/new-content?folder_id=${folder_id}`,
+                )
+              }
+            >
+              <Plus /> New {parent}
+            </Button>
+          </div>
+        )}
       </div>
 
       <section className="flex gap-8 items-start  py-4">
@@ -77,7 +86,32 @@ const ContentDetails = () => {
             key={c._id}
             className="bg-gradient-to-l from-gray-200  h-18 border w-[30%] rounded-lg p-2"
           >
-            <ContentOptionsMenu prevContent={c}>
+            {isAdmin ? (
+              <ContentOptionsMenu prevContent={c}>
+                <div className=" flex justify-between items-center">
+                  <div className="flex gap-2 items-center">
+                    <div className="w-24 h-14 overflow-hidden rounded-sm">
+                      <img
+                        src={
+                          c.thumbnail
+                            ? c.thumbnail.url
+                            : "/course_banner_bg.png"
+                        }
+                        alt={c.title}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span className="font-semibold">{c.title}</span>
+                  </div>
+
+                  <Button variant="ghost" className="cursor-pointer">
+                    <a href={c.content.url || ""} target="_blank">
+                      <ChevronRight />
+                    </a>
+                  </Button>
+                </div>
+              </ContentOptionsMenu>
+            ) : (
               <div className=" flex justify-between items-center">
                 <div className="flex gap-2 items-center">
                   <div className="w-24 h-14 overflow-hidden rounded-sm">
@@ -98,7 +132,7 @@ const ContentDetails = () => {
                   </a>
                 </Button>
               </div>
-            </ContentOptionsMenu>
+            )}
           </div>
         ))}
       </section>

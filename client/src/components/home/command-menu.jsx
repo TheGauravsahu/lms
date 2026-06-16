@@ -109,7 +109,7 @@ const CommandMenu = () => {
                     key={course.id}
                     value={course.title}
                     onSelect={() => {
-                      navigate(`/courses/${course._id}`);
+                      navigate(`/all-courses/${course._id}`);
                       setOpen(false);
                     }}
                   >

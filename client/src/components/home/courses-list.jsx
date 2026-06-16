@@ -1,13 +1,34 @@
 import { courseApi } from "@/api/courseApi";
-import LoadingScreen from "../loading-screen";
 import ErrorOccured from "../error-occured";
 import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 const CoursesList = () => {
   const { isPending, isError, data } = courseApi.useGetAllCourses();
 
-  if (isPending) return <LoadingScreen />;
+  if (isPending)
+    return (
+      <div className="w-full p-8 mt-12">
+        <h1 className="text-2xl font-semibold text-center my-4">Our Courses</h1>
+
+        <div className="flex items-center justify-center flex-wrap gap-8 mt-6">
+          {[1, 2, 3, 4].map((c) => (
+            <Skeleton className="rounded-sm  h-70 w-64" key={c}>
+              <Skeleton className=" w-full h-[60%] rounded-t-sm" />
+
+              <Skeleton className="h-4 w-8" />
+              <Skeleton className="flex justify-between">
+                <Skeleton className="h-4 w-8" />
+                <Skeleton>
+                  <Skeleton className="w-full my-3 cursor-pointer" />
+                </Skeleton>
+              </Skeleton>
+            </Skeleton>
+          ))}
+        </div>
+      </div>
+    );
   if (isError) return <ErrorOccured />;
 
   return (
