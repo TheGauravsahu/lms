@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/axios";
+import { useAuthStore } from "@/store/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -16,12 +17,16 @@ export const authApi = {
     }),
 
   useVerifyOtp: () => {
+    const login = useAuthStore.getState().login;
+    
     return useMutation({
       mutationKey: ["verify-otp"],
       onSuccess: (res) => {
         toast.success(res.message);
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.account));
+        login({
+          token: res.data.token,
+          user: res.data.account,
+        });
       },
       mutationFn: async (values) => {
         const { data } = await apiClient.post("/auth/verify-otp", values);

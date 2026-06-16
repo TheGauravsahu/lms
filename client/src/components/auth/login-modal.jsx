@@ -4,11 +4,12 @@ import VerifyOtp from "./verify-otp";
 import { useState } from "react";
 
 const LoginModal = ({ children }) => {
+  const [open, setOpen] = useState(false);
   const [step, setStep] = useState("mobile"); // "mobile"/"otp"
   const [sendResult, setSendResult] = useState(null);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-2xl sm:h-[65vh] h-[80vh]">
         {step === "mobile" ? (
@@ -18,6 +19,7 @@ const LoginModal = ({ children }) => {
             name={sendResult?.name}
             otp_data={sendResult?.otp}
             mobile_no={sendResult?.mobile_no}
+              onSuccess={() => setOpen(false)}
           />
         )}
 

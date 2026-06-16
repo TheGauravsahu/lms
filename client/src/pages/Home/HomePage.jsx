@@ -1,16 +1,16 @@
 import LoginModal from "@/components/auth/login-modal";
+import UserDropdown from "@/components/auth/user-dropdown";
 import CommandMenu from "@/components/home/command-menu";
 import CoursesList from "@/components/home/courses-list";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/auth";
 import { ChevronRight } from "lucide-react";
 
 import { useNavigate } from "react-router";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
-
-
+  const token = useAuthStore.getState().token;
 
   return (
     <div>
@@ -36,8 +36,8 @@ const HomePage = () => {
             Courses
           </h2>
 
-          {user ? (
-            <span>Hi, {user.name}</span>
+          {token ? (
+            <UserDropdown />
           ) : (
             <LoginModal>
               <Button className="bg-linear-to-b from-orange-300 to-red-500 cursor-pointer rounded-sm">

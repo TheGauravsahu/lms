@@ -19,7 +19,7 @@ const verifyOtpSchema = z.object({
   otp: z.string().length(6, "Invalid otp"),
 });
 
-const VeifyOtp = ({ mobile_no, name, otp_data }) => {
+const VeifyOtp = ({ mobile_no, name, otp_data, onSuccess }) => {
   const { isPending, mutateAsync } = authApi.useVerifyOtp();
 
   const form = useForm({
@@ -32,7 +32,8 @@ const VeifyOtp = ({ mobile_no, name, otp_data }) => {
   });
 
   const onSumbit = async (values) => {
-    await mutateAsync(values);
+    const res = await mutateAsync(values);
+    if (res?.statusCode === 200) onSuccess();
   };
 
   return (
