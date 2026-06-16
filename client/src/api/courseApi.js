@@ -25,6 +25,18 @@ export const courseApi = {
     });
   },
 
+  useSearchCourses: () => {
+    return useMutation({
+      mutationKey: ["search-courses"],
+      mutationFn: async (query) => {
+        const { data } = await apiClient.get(
+          `/courses/search-course?q=${query}`,
+        );
+        return data.data;
+      },
+    });
+  },
+
   useGetCourseDetails: (course_id) => {
     return useQuery({
       queryKey: ["course-details", course_id],

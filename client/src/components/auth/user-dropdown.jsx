@@ -11,8 +11,10 @@ import { useAuthStore } from "@/store/auth";
 import { LogOut } from "lucide-react";
 import { User2 } from "lucide-react";
 import { FolderOpen } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const UserDropdown = () => {
+  const navigate = useNavigate();
   const user = useAuthStore.getState().user;
   const logout = useAuthStore.getState().logout;
 
@@ -25,16 +27,25 @@ const UserDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-6 mt-2">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all">
+          <DropdownMenuLabel
+            onClick={() => navigate("/my-account")}
+            className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all"
+          >
             <User2 className="w-4" />
             My Account
           </DropdownMenuLabel>
-          <DropdownMenuLabel className="flex items-center gap-2 cursor-pointer  hover:bg-secondary hover:rounded-sm transition-all">
+          <DropdownMenuLabel
+            onClick={() => navigate("/my-courses")}
+            className="flex items-center gap-2 cursor-pointer  hover:bg-secondary hover:rounded-sm transition-all"
+          >
             <FolderOpen className="w-4" />
             My Courses
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuLabel onClick={()=>logout()} className="flex items-center gap-2 text-destructive cursor-pointer  hover:bg-red-100 hover:rounded-sm transition-all">
+          <DropdownMenuLabel
+            onClick={() => logout()}
+            className="flex items-center gap-2 text-destructive cursor-pointer  hover:bg-red-100 hover:rounded-sm transition-all"
+          >
             <LogOut className="w-4" />
             Logout
           </DropdownMenuLabel>

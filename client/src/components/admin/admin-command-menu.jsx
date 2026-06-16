@@ -17,23 +17,23 @@ import Spinner from "../spinner";
 
 const pages = [
   {
+    id: "dashboard",
+    title: "Dashboard",
+    path: "/admin",
+  },
+  {
     id: "all-courses",
     title: "All Courses",
-    path: "/all-courses",
+    path: "/admin/courses",
   },
   {
-    id: "account",
-    title: "My Account",
-    path: "/my-account",
-  },
-  {
-    id: "my-courses",
-    title: "My Courses",
-    path: "/my-courses",
+    id: "new-course",
+    title: "New Course",
+    path: "/admin/courses/create-course",
   },
 ];
 
-const CommandMenu = () => {
+const AdminCommandMenu = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -109,7 +109,7 @@ const CommandMenu = () => {
                     key={course.id}
                     value={course.title}
                     onSelect={() => {
-                      navigate(`/courses/${course._id}`);
+                      navigate(`/admin/courses/${course._id}`);
                       setOpen(false);
                     }}
                   >
@@ -143,4 +143,4 @@ const CommandMenu = () => {
   );
 };
 
-export default CommandMenu;
+export default AdminCommandMenu;
