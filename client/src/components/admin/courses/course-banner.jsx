@@ -1,7 +1,10 @@
 import { purchaseApi } from "@/api/purchaseApi";
+import LoginModal from "@/components/auth/login-modal";
 import PurchaseModel from "@/components/purchase/purchase-model";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatDate";
+import { useAuthStore } from "@/store/auth";
+import { ArrowRight } from "lucide-react";
 import { Sparkle } from "lucide-react";
 import { useLocation } from "react-router";
 // import { useState } from "react";
@@ -9,6 +12,7 @@ import { useLocation } from "react-router";
 const CourseBanner = ({ data }) => {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const user = useAuthStore((state) => state.user);
   const { data: isPurchased } = purchaseApi.useCheckPurchase(data.overview._id);
 
   //   const banners = ["/course_banner_bg_v2.png", "/course_banner_bg.png"];
@@ -45,19 +49,30 @@ const CourseBanner = ({ data }) => {
             </h2>
           </div>
 
-          {!isAdmin && (
-            <>
-              {isPurchased ? (
-                <div
-                  className={`${buttonVariants({ variant: "ghost" })} text-orange-600 bg-orange-100 hover:bg-orange-100 hover:text-orange-600 rounded-sm w-full my-2 cursor-pointer`}
-                >
-                  <Sparkle />
-                  Purchased
-                </div>
-              ) : (
-                <PurchaseModel course={data.overview} />
-              )}
-            </>
+          {!user ? (
+            <LoginModal>
+              <Button
+                variant="secondary"
+                className="w-full mt-2 cursor-pointer text-orange-600 bg-orange-100 hover:bg-orange-100"
+              >
+                Buy Now <ArrowRight />
+              </Button>
+            </LoginModal>
+          ) : (
+            !isAdmin && (
+              <>
+                {isPurchased ? (
+                  <div
+                    className={`${buttonVariants({ variant: "ghost" })} text-orange-600 bg-orange-100 hover:bg-orange-100 hover:text-orange-600 rounded-sm w-full my-2 cursor-pointer`}
+                  >
+                    <Sparkle />
+                    Purchased
+                  </div>
+                ) : (
+                  <PurchaseModel course={data.overview} />
+                )}
+              </>
+            )
           )}
         </div>
 

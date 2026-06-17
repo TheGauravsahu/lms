@@ -29,4 +29,14 @@ export const purchaseApi = {
       },
     });
   },
+
+  useGetMyPurchasedCourses: () => {
+    return useQuery({
+      queryKey: ["my-purchased-courses"],
+      queryFn: async () => {
+        const { data } = await apiClient.post("/purchases/my-purchased-courses");
+        return data.data;
+      },
+    });
+  },
 };

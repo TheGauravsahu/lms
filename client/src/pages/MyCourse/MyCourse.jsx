@@ -1,34 +1,22 @@
-import { courseApi } from "@/api/courseApi";
-import ErrorOccured from "../error-occured";
-import { Button } from "../ui/button";
+import ErrorOccured from "@/components/error-occured";
+import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
-import { useLocation, useNavigate } from "react-router";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router";
+import { purchaseApi } from "@/api/purchaseApi";
 
-const CoursesList = () => {
+const MyCourse = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const isHome = location.pathname === "/";
-
-  const { isPending, isError, data } = courseApi.useGetAllCourses();
+  const { isPending, isError, data } = purchaseApi.useGetMyPurchasedCourses();
 
   if (isPending)
     return (
-      <div className={`w-full${isHome && "pt-12"}`}>
-        <h1
-          className={`text-2xl font-semibold my-4 ${isHome && "text-center"}`}
-        >
-          Our Courses
-        </h1>
+      <div className="w-full">
+        <h1 className="text-2xl font-semibold my-4">Our Courses</h1>
 
-        <div
-          className={`flex items-center  flex-wrap gap-6 mt-6 ${isHome && "justify-center"}`}
-        >
+        <div className={`flex items-center  flex-wrap gap-6 mt-6`}>
           {[1, 2, 3, 4].map((c) => (
-            <Skeleton
-              className={`rounded-sm h-70 ${isHome ? "w-64 " : "w-60"} overflow-hidden`}
-              key={c}
-            >
+            <Skeleton className="rounded-sm h-70  w-60 overflow-hidden" key={c}>
               <Skeleton className=" w-full h-[60%] rounded-t-sm" />
 
               <Skeleton className="h-4 w-8" />
@@ -46,17 +34,13 @@ const CoursesList = () => {
   if (isError) return <ErrorOccured />;
 
   return (
-    <div className={`w-full${isHome && "pt-12"}`}>
-      <h1 className={`text-2xl font-semibold my-4 ${isHome && "text-center"}`}>
-        Our Courses
-      </h1>
+    <div className={`w-full`}>
+      <h1 className={`text-2xl font-semibold my-4`}>Our Courses</h1>
 
-      <div
-        className={`flex items-center  flex-wrap gap-6 mt-6 ${isHome && "justify-center"}`}
-      >
+      <div className={`flex items-center  flex-wrap gap-6 mt-6`}>
         {data.map((c) => (
           <div
-            className={`rounded-sm bg-linear-to-t from-gray-100 to-orange-600  border h-70 ${isHome ? "w-64 " : "w-60"} overflow-hidden`}
+            className={`rounded-sm bg-linear-to-t from-gray-100 to-orange-600  border h-70  w-60 overflow-hidden`}
             key={c._id}
           >
             <div
@@ -88,7 +72,7 @@ const CoursesList = () => {
                 onClick={() => navigate("/all-courses/" + c._id)}
                 className="w-full my-3 cursor-pointer"
               >
-                Explore <ArrowRight />
+                Go to Course <ArrowRight />
               </Button>
             </div>
           </div>
@@ -98,4 +82,4 @@ const CoursesList = () => {
   );
 };
 
-export default CoursesList;
+export default MyCourse;

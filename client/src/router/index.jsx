@@ -12,6 +12,7 @@ import NewContent from "@/pages/Admin/Courses/Content/NewContent";
 import HomePage from "@/pages/Home/HomePage";
 import UserLayout from "@/pages/Home/UserLayout";
 import CoursesList from "@/components/home/courses-list";
+import MyCourse from "@/pages/MyCourse/MyCourse";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -19,6 +20,11 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       { index: true, element: <HomePage /> },
+      {
+        path: "all-courses",
+        element: <UserLayout />,
+        children: [{ index: true, element: <MyCourse /> }],
+      },
       {
         path: "all-courses",
         element: <UserLayout />,
