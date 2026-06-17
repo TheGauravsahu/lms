@@ -15,13 +15,13 @@ export const purchaseApi = {
     });
   },
 
-  usePurchaseCourse: () => {
+  usePurchaseCourse: (course_id) => {
     return useMutation({
       mutationKey: ["purchase-course"],
       onSuccess: (res) => {
         toast.success(res.message);
       },
-      mutationFn: async (course_id) => {
+      mutationFn: async () => {
         const { data } = await apiClient.post("/purchases/purchase-course", {
           course_id,
         });

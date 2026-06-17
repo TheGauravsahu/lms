@@ -30,7 +30,7 @@ class PurchaseController {
     const base_price = course.overview.offer_price;
     const gst_percentage = 18;
     const gst_amount = (base_price * gst_percentage) / 100;
-    const total_price = base_price + gst_amount;
+    const total_price = Number(base_price + gst_amount).toFixed();
 
     const purchase = await purchaseModel.create({
       base_price,
