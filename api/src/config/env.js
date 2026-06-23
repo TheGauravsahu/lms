@@ -8,4 +8,5 @@ export default {
   REDIS_URL: process.env.REDIS_URL,
   REDIS_TOKEN: process.env.REDIS_TOKEN,
   LMS_CLIENT_URL: process.env.LMS_CLIENT_URL || "",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
 };

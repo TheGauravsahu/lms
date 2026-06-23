@@ -28,6 +28,7 @@ export const openApiSpec = {
     { name: "Announcements", description: "Course and global announcements" },
     { name: "Productivity", description: "Calendar, Watch Later, Playback Tracking, Resources" },
     { name: "Search", description: "Global unified search" },
+    { name: "AI", description: "AI Tutor, notes, quizzes, roadmaps" },
   ],
   components: {
     securitySchemes: {
@@ -775,6 +776,146 @@ export const openApiSpec = {
           { name: "q", in: "query", required: true, schema: { type: "string" } },
         ],
         responses: { 200: { description: "Unified search results" } },
+      },
+    },
+
+    // ─── AI ─────────────────────────────────────────────────────────
+    "/ai/tutor/sessions": {
+      get: {
+        tags: ["AI"],
+        summary: "Get chat sessions list",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Chat sessions list" } },
+      },
+    },
+    "/ai/tutor/sessions/{id}": {
+      get: {
+        tags: ["AI"],
+        summary: "Get single session details",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Session details" } },
+      },
+      delete: {
+        tags: ["AI"],
+        summary: "Delete a session",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Session deleted" } },
+      },
+    },
+    "/ai/tutor/chat": {
+      post: {
+        tags: ["AI"],
+        summary: "Send a message / start chat",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["message"],
+                properties: {
+                  sessionId: { type: "string" },
+                  message: { type: "string" },
+                  lessonId: { type: "string" },
+                  lessonTitle: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "AI reply generated" } },
+      },
+    },
+    "/ai/notes": {
+      post: {
+        tags: ["AI"],
+        summary: "Generate study notes",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["lessonTitle"],
+                properties: {
+                  lessonTitle: { type: "string" },
+                  context: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "Study notes generated" } },
+      },
+    },
+    "/ai/quiz": {
+      post: {
+        tags: ["AI"],
+        summary: "Generate MCQs practice quiz",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["lessonTitle"],
+                properties: {
+                  lessonTitle: { type: "string" },
+                  context: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "Quiz generated" } },
+      },
+    },
+    "/ai/roadmap": {
+      get: {
+        tags: ["AI"],
+        summary: "Get user saved roadmaps",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Roadmaps list" } },
+      },
+      post: {
+        tags: ["AI"],
+        summary: "Generate and save a roadmap",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["goal"],
+                properties: {
+                  goal: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 201: { description: "Roadmap generated" } },
+      },
+    },
+    "/ai/roadmap/{id}": {
+      delete: {
+        tags: ["AI"],
+        summary: "Delete a saved roadmap",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Roadmap deleted" } },
       },
     },
   },

@@ -24,6 +24,7 @@ import peerReviewRoutes from "./peerreviews/route.js";
 import announcementRoutes from "./announcements/route.js";
 import productivityRoutes from "./productivity/route.js";
 import searchRoutes from "./search/route.js";
+import aiRoutes from "./ai/route.js";
 import { apiReference } from "@scalar/express-api-reference";
 import { openApiSpec } from "./docs/openapi.js";
 import mongoose from "mongoose";
@@ -99,6 +100,7 @@ app.use("/api/peer-reviews", peerReviewRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/productivity", productivityRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/ai", aiRoutes);
 
 // ─── API Documentation (Scalar) ───────────────────────────────────────────────
 app.get("/docs/spec.json", (req, res) => res.json(openApiSpec));

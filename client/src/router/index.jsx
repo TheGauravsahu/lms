@@ -38,6 +38,9 @@ import Resources from "@/pages/Home/Resources";
 import WatchLater from "@/pages/Home/WatchLater";
 import GlobalSearch from "@/pages/Home/GlobalSearch";
 import AdminAnnouncements from "@/pages/Admin/Announcements/AdminAnnouncements";
+import AiTutor from "@/pages/Home/AiTutor";
+import AiRoadmap from "@/pages/Home/AiRoadmap";
+import NotFound from "@/pages/Home/NotFound";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -127,6 +130,16 @@ export const router = createBrowserRouter([
             path: "search",
             element: <UserLayout />,
             children: [{ index: true, element: <GlobalSearch /> }],
+          },
+          {
+            path: "ai-tutor",
+            element: <UserLayout />,
+            children: [{ index: true, element: <AiTutor /> }],
+          },
+          {
+            path: "ai-roadmap",
+            element: <UserLayout />,
+            children: [{ index: true, element: <AiRoadmap /> }],
           },
         ],
       },
@@ -257,6 +270,12 @@ export const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      // Catch-all 404 page
+      {
+        path: "*",
+        element: <UserLayout />,
+        children: [{ index: true, element: <NotFound /> }],
       },
     ],
   },

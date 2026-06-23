@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2, MessageSquare, UsersRound, GitPullRequest, Megaphone, Search, CalendarDays, Download, PlaySquare } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2, MessageSquare, UsersRound, GitPullRequest, Megaphone, Search, CalendarDays, Download, PlaySquare, Sparkles, Bot, Map } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/auth";
 
@@ -66,6 +66,11 @@ const communityItems = [
   { title: "Forums", icon: MessageSquare, href: "/forums" },
   { title: "Study Groups", icon: UsersRound, href: "/study-groups" },
   { title: "Peer Reviews", icon: GitPullRequest, href: "/peer-reviews" },
+];
+
+const aiItems = [
+  { title: "AI Tutor Chat", icon: Bot, href: "/ai-tutor" },
+  { title: "AI Roadmap", icon: Map, href: "/ai-roadmap" },
 ];
 
 const UserSidebar = () => {
@@ -138,6 +143,23 @@ const UserSidebar = () => {
           <SidebarGroupLabel>Productivity</SidebarGroupLabel>
           <SidebarMenu>
             {productivityItems.map((item) => (
+              <SidebarMenuItem
+                key={item.title}
+                onClick={() => navigate(item.href)}
+              >
+                <SidebarMenuButton className="cursor-pointer gap-4 text-muted-foreground">
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>AI Assistant</SidebarGroupLabel>
+          <SidebarMenu>
+            {aiItems.map((item) => (
               <SidebarMenuItem
                 key={item.title}
                 onClick={() => navigate(item.href)}

@@ -31,6 +31,8 @@ const pages = [
   { id: "resources", title: "Downloadable Handouts & PDF Resources", path: "/productivity/resources" },
   { id: "watch-later", title: "Watch Later Queue", path: "/productivity/watch-later" },
   { id: "search", title: "Global Knowledge Search", path: "/search" },
+  { id: "ai-tutor", title: "AI Tutor Chatbot Assistant", path: "/ai-tutor" },
+  { id: "ai-roadmap", title: "AI Learning Roadmap Generator", path: "/ai-roadmap" },
 ];
 
 const CommandMenu = () => {
