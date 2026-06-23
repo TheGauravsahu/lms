@@ -23,6 +23,8 @@ import { openApiSpec } from "./docs/openapi.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(cors({ origin: env.LMS_CLIENT_URL, credentials: true }));
 
 // Helmet: relaxed CSP for Scalar /docs UI, strict for all other routes.
