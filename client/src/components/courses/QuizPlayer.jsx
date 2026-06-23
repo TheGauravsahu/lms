@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2, XCircle, Timer, Award, RotateCcw, ChevronRight } from "lucide-react";
+import { quizApi } from "@/api/quizApi";
 
-export const QuizPlayer = ({ url, title, onComplete }) => {
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const QuizPlayer = ({ quizId, title, onComplete }) => {
+  const { data: quiz, isPending: loading, error } = quizApi.useGetQuizDetails(quizId);
+  const questions = quiz?.questions || [];
 
   // Quiz States
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -15,26 +15,15 @@ export const QuizPlayer = ({ url, title, onComplete }) => {
   const [timeLeft, setTimeLeft] = useState(30); // 30s per question
   const [quizFinished, setQuizFinished] = useState(false);
 
-  // Fetch quiz JSON
+  // Reset state on quizId change
   useEffect(() => {
-    if (!url) return;
-    setLoading(true);
-    setError(null);
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load quiz file");
-        return res.json();
-      })
-      .then((data) => {
-        if (!Array.isArray(data)) throw new Error("Invalid quiz format. Expected an array.");
-        setQuestions(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Failed to load quiz.");
-        setLoading(false);
-      });
-  }, [url]);
+    setCurrentIdx(0);
+    setSelectedAnswers({});
+    setIsSubmitted(false);
+    setScore(0);
+    setTimeLeft(30);
+    setQuizFinished(false);
+  }, [quizId]);
 
   // Timer logic
   useEffect(() => {
@@ -111,8 +100,8 @@ export const QuizPlayer = ({ url, title, onComplete }) => {
       <div className="flex flex-col items-center justify-center p-8 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-center">
         <AlertCircle className="w-8 h-8 mb-2" />
         <h4 className="font-bold text-sm">Failed to load Quiz</h4>
-        <p className="text-xs text-muted-foreground mt-1 max-w-xs">{error}</p>
-        <p className="text-[10px] text-muted-foreground mt-4">Make sure you uploaded a valid JSON array of questions.</p>
+        <p className="text-xs text-muted-foreground mt-1 max-w-xs">{error?.message || "Failed to load quiz"}</p>
+        <p className="text-[10px] text-muted-foreground mt-4">Make sure the quiz is created and valid.</p>
       </div>
     );
   }

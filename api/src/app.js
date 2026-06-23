@@ -17,6 +17,7 @@ import adminRoutes from "./admin/route.js";
 import progressRoutes from "./progress/route.js";
 import commentRoutes from "./comments/route.js";
 import reviewRoutes from "./reviews/route.js";
+import quizRoutes from "./quiz/route.js";
 import { apiReference } from "@scalar/express-api-reference";
 import { openApiSpec } from "./docs/openapi.js";
 
@@ -82,6 +83,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/quizzes", quizRoutes);
 
 // ─── API Documentation (Scalar) ───────────────────────────────────────────────
 app.get("/docs/spec.json", (req, res) => res.json(openApiSpec));

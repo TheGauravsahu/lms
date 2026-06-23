@@ -54,7 +54,8 @@ export const createCourseContentSchema = z.object({
   folder_id: z.string().min(1, "course_id is required"),
   title: z.string().min(1, "title is required"),
   thumbnail: z.string().min(1, "thumbnail is required").optional(),
-  content: z.string().min(1, "thumbnail is required"),
+  content: z.string().optional(),
+  quiz_id: z.string().optional(),
   content_type: z.enum(CONTENT_TYPE),
 });
 
@@ -62,7 +63,8 @@ export const editCourseContentSchema = z.object({
   folder_id: z.string().min(1, "course_id is required"),
   title: z.string().min(1, "title is required").optional(),
   thumbnail: z.string().min(1, "thumbnail is required").optional(),
-  content: z.string().min(1, "thumbnail is required").optional(),
+  content: z.string().optional(),
+  quiz_id: z.string().optional(),
   content_type: z.enum(CONTENT_TYPE).optional(),
 });
 

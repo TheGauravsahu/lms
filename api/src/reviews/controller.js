@@ -6,7 +6,7 @@ export const reviewController = {
   // Create or Update a review (upsert behaviour for better user experience)
   addReview: asyncHandler(async (req, res) => {
     const { course_id, rating, review_text } = req.body;
-    const account_id = req.user.id;
+    const account_id = req.account.account_id;
 
     if (!course_id || !rating) {
       return res.error(400, "Bad Request", "course_id and rating are required.");
@@ -83,8 +83,8 @@ export const reviewController = {
   // Delete a review (by owner or admin)
   deleteReview: asyncHandler(async (req, res) => {
     const { review_id } = req.params;
-    const account_id = req.user.id;
-    const isClientAdmin = req.user.role === "ADMIN";
+    const account_id = req.account.account_id;
+    const isClientAdmin = req.account.role === "ADMIN";
 
     const review = await reviewModel.findById(review_id);
     if (!review) {

@@ -60,7 +60,7 @@ export const CourseReviews = ({ courseId }) => {
   const { reviews = [], summary = { averageRating: 0, totalReviews: 0, ratingDistribution: {} } } = reviewData || {};
 
   // Check if current user has already reviewed the course
-  const hasReviewed = reviews.some((r) => r.account_id?._id === user?.id);
+  const hasReviewed = reviews.some((r) => r.account_id?._id === user?._id);
 
   // Can the user submit a review? (Must be logged in, not admin, has purchased, and not already reviewed)
   const canReview = user && !isAdmin && isPurchased && !hasReviewed;
@@ -206,7 +206,7 @@ export const CourseReviews = ({ courseId }) => {
         ) : (
           <div className="space-y-4">
             {reviews.map((r) => {
-              const isOwner = r.account_id?._id === user?.id;
+              const isOwner = r.account_id?._id === user?._id;
               const showDelete = isOwner || isAdmin;
               
               return (

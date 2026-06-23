@@ -134,7 +134,8 @@ class CourseService {
 
     const contents = await courseContentModel
       .find({ folder_id })
-      .populate("thumbnail content", "url");
+      .populate("thumbnail content", "url")
+      .populate("quiz_id");
     return contents;
   };
 
@@ -144,13 +145,16 @@ class CourseService {
     content_type,
     thumbnail,
     content,
+    quiz_id,
   }) => {
     const cacheKey = `course_contents:${folder_id}`;
     const data = await courseContentModel.create({
       folder_id,
       title,
       content_type,
+      thumbnail: thumbnail || null,
       content,
+      quiz_id: quiz_id || null,
     });
     await deleteCache(cacheKey);
     return data;
@@ -162,6 +166,7 @@ class CourseService {
     content_type,
     thumbnail,
     content,
+    quiz_id,
   }) => {
     const cacheKey = `course_contents:${folder_id}`;
     const course_content = await courseContentModel.findOne({ folder_id });
@@ -169,7 +174,7 @@ class CourseService {
 
     const updatedCourseContent = await courseContentModel.findByIdAndUpdate(
       course_content._id,
-      { title, content_type, thumbnail, content },
+      { title, content_type, thumbnail, content, quiz_id },
       { new: true, runValidators: true },
     );
 

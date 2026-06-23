@@ -14,6 +14,7 @@ import {
   Users,
   LayoutPanelLeft,
   Settings,
+  Brain,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -32,6 +33,11 @@ const items = [
     title: "Students",
     icon: Users,
     href: "/admin/students",
+  },
+  {
+    title: "Quizzes",
+    icon: Brain,
+    href: "/admin/quizzes",
   },
   {
     title: "Upload",

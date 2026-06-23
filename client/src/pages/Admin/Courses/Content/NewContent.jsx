@@ -20,12 +20,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CONTENT_TYPE } from "@/lib/constants";
+import { quizApi } from "@/api/quizApi";
 
 const createCourseContentSchema = z.object({
   folder_id: z.string().min(1, "course_id is required"),
   title: z.string().min(1, "title is required"),
   thumbnail: z.string().min(1, "thumbnail is required").optional(),
-  content: z.string().min(1, "thumbnail is required"),
+  content: z.string().optional(),
+  quiz_id: z.string().optional(),
   content_type: z.enum(CONTENT_TYPE),
 });
 
@@ -34,13 +36,19 @@ const NewContent = () => {
   const folder_id = searchParams.get("folder_id");
 
   const { mutateAsync, isPending } = courseApi.useCreateContent();
+  const { data: quizzes = [] } = quizApi.useGetAllQuizzes();
 
   const form = useForm({
     resolver: zodResolver(createCourseContentSchema),
     defaultValues: {
       folder_id,
+      content_type: "VIDEO",
+      content: "",
+      quiz_id: "",
     },
   });
+
+  const contentType = form.watch("content_type");
 
   async function onSubmit(values) {
     console.log(values);
@@ -57,7 +65,7 @@ const NewContent = () => {
           </p>
 
           <form
-            className="mt-10 w-full w-full space-y-6"
+            className="mt-10 w-full space-y-6"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             {/* fields */}
@@ -84,17 +92,46 @@ const NewContent = () => {
               />
             </div>
 
-            {/* content upload */}
-            <div className="w-full">
-              <Label className="my-2">Content</Label>
-              <CreateUpload
-                onChange={(url) =>
-                  form.setValue("content", url, {
-                    shouldValidate: true,
-                  })
-                }
-              />
-            </div>
+            {/* conditional content / quiz selector */}
+            {contentType === "QUIZ" ? (
+              <div className="w-full">
+                <Label>Link Quiz</Label>
+                <Select
+                  value={form.watch("quiz_id")}
+                  onValueChange={(value) =>
+                    form.setValue("quiz_id", value, {
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  <SelectTrigger className="bg-input mt-2 w-full">
+                    <SelectValue placeholder="Select Quiz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {quizzes.map((quiz) => (
+                        <SelectItem key={quiz._id} value={quiz._id}>
+                          {quiz.title} ({quiz.questions.length} Qs)
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormError form={form} field="quiz_id" />
+              </div>
+            ) : (
+              <div className="w-full">
+                <Label className="my-2">Content</Label>
+                <CreateUpload
+                  onChange={(url) =>
+                    form.setValue("content", url, {
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <FormError form={form} field="content" />
+              </div>
+            )}
 
             {/* content_type */}
             <div>

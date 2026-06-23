@@ -25,7 +25,12 @@ const contentSchema = new mongoose.Schema(
     content: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "uploads",
-      required: true,
+      required: false,
+    },
+    quiz_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Quiz",
+      default: null,
     },
   },
   { timestamps: true },

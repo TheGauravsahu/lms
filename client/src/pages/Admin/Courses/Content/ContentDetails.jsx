@@ -138,7 +138,7 @@ const ContentDetails = () => {
             </Button>
           </div>
           <QuizPlayer
-            url={activeQuiz.url}
+            quizId={activeQuiz.quizId}
             title={activeQuiz.title}
             onComplete={() => {
               if (!completedSet.has(activeQuiz.id)) {
@@ -277,11 +277,11 @@ const ContentDetails = () => {
                       variant="ghost"
                       size="icon"
                       className={`cursor-pointer rounded-full h-8 w-8 hover:bg-secondary ${
-                        activeQuiz?.url === c.content.url ? "text-orange-500 bg-secondary" : ""
+                        activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "text-orange-500 bg-secondary" : ""
                       }`}
                       onClick={() => {
                         setActiveVideo(null); // Close video if quiz opened
-                        setActiveQuiz({ url: c.content.url, title: c.title, id: c._id });
+                        setActiveQuiz({ quizId: c.quiz_id?._id || c.quiz_id, title: c.title, id: c._id });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
@@ -289,7 +289,7 @@ const ContentDetails = () => {
                     </Button>
                   ) : (
                     <Button variant="ghost" size="icon" className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary" asChild>
-                      <a href={c.content.url || ""} target="_blank" rel="noopener noreferrer">
+                      <a href={c.content?.url || ""} target="_blank" rel="noopener noreferrer">
                         <ChevronRight className="w-4 h-4" />
                       </a>
                     </Button>
@@ -302,7 +302,7 @@ const ContentDetails = () => {
               <div
                 key={c._id}
                 className={`bg-card dark:bg-muted/40 border rounded-lg p-3 shadow-2xs hover:shadow-xs transition-all ${
-                  activeVideo?.url === c.content.url || activeQuiz?.url === c.content.url ? "border-orange-500 ring-1 ring-orange-500/50" : ""
+                  activeVideo?.url === c.content?.url || activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "border-orange-500 ring-1 ring-orange-500/50" : ""
                 } ${isCompleted && !isAdmin ? "opacity-90 border-green-500/30 bg-green-500/2 dark:bg-green-500/1" : ""}`}
               >
                 {cardContent}
