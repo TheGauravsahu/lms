@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash, Brain, AlertCircle, Trash2 } from "lucide-react";
 import LoadingButton from "@/components/loading-button";
 import EmptyState from "@/components/empty-state";
@@ -17,6 +18,7 @@ export const AdminQuizzes = () => {
   // Dialog / Sheet states
   const [openSheet, setOpenSheet] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState(null);
+  const [deleteQuizId, setDeleteQuizId] = useState(null);
 
   // Form states
   const [title, setTitle] = useState("");
@@ -44,10 +46,8 @@ export const AdminQuizzes = () => {
     setOpenSheet(true);
   };
 
-  const handleDelete = (quizId) => {
-    if (confirm("Are you sure you want to delete this quiz? This cannot be undone.")) {
-      deleteMutation.mutate(quizId);
-    }
+  const handleDeleteClick = (quizId) => {
+    setDeleteQuizId(quizId);
   };
 
   // Form helpers
@@ -180,7 +180,7 @@ export const AdminQuizzes = () => {
                   <Pencil className="w-3.5 h-3.5" />
                 </Button>
                 <Button
-                  onClick={() => handleDelete(quiz._id)}
+                  onClick={() => handleDeleteClick(quiz._id)}
                   variant="outline"
                   size="icon"
                   className="w-8 h-8 cursor-pointer text-destructive hover:bg-destructive/5 border-destructive/20 hover:border-destructive"
@@ -327,6 +327,45 @@ export const AdminQuizzes = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteQuizId} onOpenChange={(open) => !open && setDeleteQuizId(null)}>
+        <DialogContent className="max-w-md bg-card text-foreground">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-5 h-5" />
+              Delete Quiz
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs pt-1">
+              Are you sure you want to delete this quiz? This action is permanent and cannot be undone. All questions in this quiz will be deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteQuizId(null)}
+              className="text-xs cursor-pointer bg-background text-foreground"
+            >
+              Cancel
+            </Button>
+            <LoadingButton
+              onClick={() => {
+                if (deleteQuizId) {
+                  deleteMutation.mutate(deleteQuizId, {
+                    onSuccess: () => setDeleteQuizId(null),
+                  });
+                }
+              }}
+              isPending={deleteMutation.isPending}
+              loadingText="Deleting..."
+              variant="destructive"
+              className="text-xs bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+            >
+              Delete Quiz
+            </LoadingButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

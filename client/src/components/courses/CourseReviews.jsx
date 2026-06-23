@@ -23,6 +23,7 @@ export const CourseReviews = ({ courseId }) => {
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,9 +38,19 @@ export const CourseReviews = ({ courseId }) => {
       {
         onSuccess: () => {
           setReviewText("");
+          setIsEditing(false);
         },
       }
     );
+  };
+
+  const handleStartEdit = () => {
+    const myReview = reviews.find((r) => r.account_id?._id === user?._id);
+    if (myReview) {
+      setRating(myReview.rating);
+      setReviewText(myReview.review_text || "");
+      setIsEditing(true);
+    }
   };
 
   const handleDelete = (reviewId) => {
@@ -62,8 +73,8 @@ export const CourseReviews = ({ courseId }) => {
   // Check if current user has already reviewed the course
   const hasReviewed = reviews.some((r) => r.account_id?._id === user?._id);
 
-  // Can the user submit a review? (Must be logged in, not admin, has purchased, and not already reviewed)
-  const canReview = user && !isAdmin && isPurchased && !hasReviewed;
+  // Can the user submit a review? (Must be logged in, not admin, has purchased, and not already reviewed OR in edit mode)
+  const canReview = user && !isAdmin && isPurchased && (!hasReviewed || isEditing);
 
   return (
     <div className="space-y-8 mt-12 border-t border-border/50 pt-8">
@@ -168,13 +179,25 @@ export const CourseReviews = ({ courseId }) => {
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={addReviewMutation.isPending}
-            className="bg-linear-to-b from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white font-semibold text-xs cursor-pointer rounded-md h-9 py-0 px-4"
-          >
-            Submit Review
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              disabled={addReviewMutation.isPending}
+              className="bg-linear-to-b from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white font-semibold text-xs cursor-pointer rounded-md h-9 py-0 px-4"
+            >
+              {isEditing ? "Update Review" : "Submit Review"}
+            </Button>
+            {isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+                className="text-xs cursor-pointer h-9 py-0 px-4 bg-background text-foreground"
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       )}
 
@@ -186,10 +209,20 @@ export const CourseReviews = ({ courseId }) => {
         </div>
       )}
 
-      {hasReviewed && (
-        <div className="bg-green-500/5 border border-green-500/10 text-green-600 dark:text-green-400 p-3 rounded-lg flex items-start gap-2.5 text-xs">
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>You have already submitted a review for this course. Thank you for your feedback!</span>
+      {hasReviewed && !isEditing && (
+        <div className="bg-green-500/5 border border-green-500/10 text-green-600 dark:text-green-400 p-3 rounded-lg flex items-center justify-between text-xs animate-in fade-in duration-300">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>You have already submitted a review for this course. Thank you for your feedback!</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleStartEdit}
+            className="text-xs cursor-pointer h-7 py-0 px-3 ml-4 bg-background text-foreground shrink-0"
+          >
+            Edit Review
+          </Button>
         </div>
       )}
 

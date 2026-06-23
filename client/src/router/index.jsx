@@ -19,6 +19,7 @@ import AdminUploadPage from "@/pages/Admin/AdminUploadPage";
 import StudentsList from "@/pages/Admin/Students/StudentsList";
 import StudentDashboard from "@/pages/Home/StudentDashboard";
 import AdminQuizzes from "@/pages/Admin/Quizzes/AdminQuizzes";
+import Quizzes from "@/pages/Home/Quizzes";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -50,6 +51,11 @@ export const router = createBrowserRouter([
             path: "dashboard",
             element: <UserLayout />,
             children: [{ index: true, element: <StudentDashboard /> }],
+          },
+          {
+            path: "quizzes",
+            element: <UserLayout />,
+            children: [{ index: true, element: <Quizzes /> }],
           },
         ],
       },
