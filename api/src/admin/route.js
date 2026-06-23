@@ -4,15 +4,23 @@ import { accountModel } from "../auth/model.js";
 import { courseModel } from "../course/models/course.js";
 import { purchaseModel } from "../purchase/model.js";
 import { verifyToken, verifyRoles } from "../middleware/auth.js";
+import { deleteCache, getCache, setCache } from "../config/redis.js";
 
 const r = express.Router();
 r.use(verifyToken);
 r.use(verifyRoles("ADMIN"));
 
+const STATS_CACHE_KEY = "admin:dashboard:stats";
+const STATS_TTL = 60 * 5; // 5 minutes — dashboard data refreshes frequently
+
 // GET /api/admin/stats — dashboard stats + monthly chart data
 r.get(
   "/stats",
   asyncHandler(async (req, res) => {
+    const cached = await getCache(STATS_CACHE_KEY);
+    if (cached)
+      return res.success(200, cached, "Dashboard stats fetched successfully.");
+
     const [totalStudents, totalCourses, purchases] = await Promise.all([
       accountModel.countDocuments({ role: "USER" }),
       courseModel.countDocuments(),
@@ -50,20 +58,19 @@ r.get(
       .populate("course_id", "title")
       .populate("account_id", "name mobile_no");
 
-    res.success(
-      200,
-      {
-        stats: {
-          totalStudents,
-          totalCourses,
-          totalPurchases: purchases.length,
-          totalRevenue,
-        },
-        monthlyChart: Object.values(monthlyData),
-        recentPurchases,
+    const payload = {
+      stats: {
+        totalStudents,
+        totalCourses,
+        totalPurchases: purchases.length,
+        totalRevenue,
       },
-      "Dashboard stats fetched successfully.",
-    );
+      monthlyChart: Object.values(monthlyData),
+      recentPurchases,
+    };
+
+    await setCache(STATS_CACHE_KEY, payload, STATS_TTL);
+    res.success(200, payload, "Dashboard stats fetched successfully.");
   }),
 );
 

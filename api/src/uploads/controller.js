@@ -1,5 +1,9 @@
 import { uploadModel } from "./model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { deleteCache, getCache, setCache } from "../config/redis.js";
+
+const UPLOADS_CACHE_KEY = "uploads:recent";
+const UPLOADS_TTL = 60 * 2; // 2 minutes
 
 class UploadController {
   uploadFile = asyncHandler(async (req, res) => {
@@ -9,15 +13,17 @@ class UploadController {
       size: req.upload.size,
       url: req.upload.url,
     });
+    await deleteCache(UPLOADS_CACHE_KEY);
     res.success(201, data, "File uploaded successfully");
   });
 
   getRecentUploads = asyncHandler(async (req, res) => {
-    res.success(
-      200,
-      await uploadModel.find().limit(5), // todo: add .sort(createdAt)
-      "Recent Uplods fetched successfully.",
-    );
+    const cached = await getCache(UPLOADS_CACHE_KEY);
+    if (cached) return res.success(200, cached, "Recent Uploads fetched successfully.");
+
+    const uploads = await uploadModel.find().sort({ createdAt: -1 }).limit(5);
+    await setCache(UPLOADS_CACHE_KEY, uploads, UPLOADS_TTL);
+    res.success(200, uploads, "Recent Uploads fetched successfully.");
   });
 }
 

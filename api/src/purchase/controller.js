@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { purchaseModel } from "./model.js";
 import { courseService } from "../course/service.js";
+import { deleteCache, getCache, setCache } from "../config/redis.js";
 
 class PurchaseController {
   purchaseCourse = asyncHandler(async (req, res) => {
@@ -41,6 +42,10 @@ class PurchaseController {
       course_id,
       status: "COMPLETED",
     });
+    // Invalidate user-specific caches
+    await deleteCache(`purchases:user:${account_id}`);
+    await deleteCache(`purchase:check:${account_id}:${course_id}`);
+    await deleteCache("admin:dashboard:stats");
     res.success(201, purchase, "Purchase compeleted successfully.");
   });
 
@@ -54,12 +59,14 @@ class PurchaseController {
     const { account_id } = req.account;
     const { course_id } = req.body;
 
+    const cacheKey = `purchase:check:${account_id}:${course_id}`;
+    const cached = await getCache(cacheKey);
+    if (cached !== null) return res.success(200, cached, "Purchase checked successfully.");
+
     const purchase = await purchaseModel.findOne({ account_id, course_id });
-    res.success(
-      200,
-      { isPurchased: !!purchase },
-      "Purchase checked successfully.",
-    );
+    const result = { isPurchased: !!purchase };
+    await setCache(cacheKey, result, 60 * 30); // 30 min
+    res.success(200, result, "Purchase checked successfully.");
   });
 
   getPurchaseDetails = asyncHandler(async (req, res) => {
@@ -71,6 +78,11 @@ class PurchaseController {
 
   getCurrenUserPurchasedCourses = asyncHandler(async (req, res) => {
     const { account_id } = req.account;
+    const cacheKey = `purchases:user:${account_id}`;
+
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Purchases fetched successfully.");
+
     const purchases = await purchaseModel.find({ account_id }).populate({
       path: "course_id",
       populate: {
@@ -79,6 +91,7 @@ class PurchaseController {
       },
     });
     const courses = purchases.map((p) => p.course_id);
+    await setCache(cacheKey, courses, 60 * 15); // 15 min
     res.success(200, courses, "Purchases fetched successfully.");
   });
 

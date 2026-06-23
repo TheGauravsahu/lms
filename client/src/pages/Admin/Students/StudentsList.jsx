@@ -264,12 +264,12 @@ const StudentsList = () => {
       {/* Edit Student Sheet */}
       <Sheet open={editOpen} onOpenChange={setEditOpen}>
         <SheetContent className="sm:max-w-md">
-          <SheetHeader>
+          <SheetHeader className="px-6 pt-6">
             <SheetTitle>Edit Student</SheetTitle>
             <SheetDescription>Update student account information.</SheetDescription>
           </SheetHeader>
           {editTarget && (
-            <form onSubmit={handleEdit} className="space-y-4 mt-6 px-1">
+            <form onSubmit={handleEdit} className="space-y-4 px-6 py-4">
               <div className="space-y-1.5">
                 <Label>Full Name</Label>
                 <Input value={editTarget.name} onChange={(e) => setEditTarget({ ...editTarget, name: e.target.value })} className="rounded-sm" required />

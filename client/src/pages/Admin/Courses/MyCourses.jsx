@@ -120,75 +120,79 @@ const MyCourses = () => {
         </Button>
       </div>
 
-      <Table className="border rounded-lg mt-4">
-        <TableHeader>
-          <TableRow className="*:text-muted-foreground *:uppercase">
-            <TableHead>Course</TableHead>
-            <TableHead>Course Id</TableHead>
-            <TableHead>Offer Price</TableHead>
-            <TableHead>Original Price</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((c) => (
-            <TableRow key={c._id}>
-              <TableCell
-                onClick={() => navigate("/admin/courses/" + c._id)}
-                className="flex items-start gap-8 p-4 cursor-pointer"
-              >
-                <div className="w-42 h-32 overflow-hidden rounded-md shrink-0">
-                  <img
-                    src={c.thumbnail?.url}
-                    alt={c.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <h2 className="font-semibold text-xl">{c.title}</h2>
-                  <span className="text-muted-foreground text-xs">
-                    Created: {formatDate(c.createdAt)}
-                  </span>
-                  <span className="bg-secondary text-xs w-fit rounded-full px-3 py-1">
-                    <CourseStatus status={c.status} />
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="text-xs text-muted-foreground">{c._id}</TableCell>
-              <TableCell className="font-semibold">₹{c.offer_price}</TableCell>
-              <TableCell className="text-muted-foreground line-through">₹{c.original_price}</TableCell>
-              <TableCell>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  c.status === "PUBLISHED" ? "bg-green-100 text-green-700" :
-                  c.status === "DRAFT" ? "bg-yellow-100 text-yellow-700" :
-                  "bg-gray-100 text-gray-600"
-                }`}>
-                  {c.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right space-x-2">
-                <Button variant="outline" size="icon" className="h-8 w-8 cursor-pointer" onClick={(e) => openEdit(e, c)}>
-                  <Pencil className="w-3.5 h-3.5" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8 cursor-pointer text-destructive hover:bg-red-50" onClick={(e) => openDelete(e, c)}>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              </TableCell>
+      <div className="rounded-lg border overflow-x-auto mt-4">
+        <Table>
+          <TableHeader>
+            <TableRow className="*:text-muted-foreground *:uppercase">
+              <TableHead>Course</TableHead>
+              <TableHead className="hidden md:table-cell">Course Id</TableHead>
+              <TableHead className="hidden sm:table-cell">Offer Price</TableHead>
+              <TableHead className="hidden sm:table-cell">Orig. Price</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data.map((c) => (
+              <TableRow key={c._id}>
+                <TableCell
+                  onClick={() => navigate("/admin/courses/" + c._id)}
+                  className="p-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 h-14 sm:w-28 sm:h-20 overflow-hidden rounded-md shrink-0">
+                      <img
+                        src={c.thumbnail?.url}
+                        alt={c.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <h2 className="font-semibold text-sm sm:text-base truncate max-w-[160px] sm:max-w-xs">{c.title}</h2>
+                      <span className="text-muted-foreground text-xs">
+                        Created: {formatDate(c.createdAt)}
+                      </span>
+                      <span className="sm:hidden text-xs font-semibold text-orange-600">₹{c.offer_price}</span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden md:table-cell text-xs text-muted-foreground font-mono max-w-[100px] truncate">{c._id}</TableCell>
+                <TableCell className="hidden sm:table-cell font-semibold">₹{c.offer_price}</TableCell>
+                <TableCell className="hidden sm:table-cell text-muted-foreground line-through">₹{c.original_price}</TableCell>
+                <TableCell>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${
+                    c.status === "PUBLISHED" ? "bg-green-100 text-green-700" :
+                    c.status === "DRAFT" ? "bg-yellow-100 text-yellow-700" :
+                    "bg-gray-100 text-gray-600"
+                  }`}>
+                    {c.status}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <Button variant="outline" size="icon" className="h-8 w-8 cursor-pointer" onClick={(e) => openEdit(e, c)}>
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 cursor-pointer text-destructive hover:bg-red-50" onClick={(e) => openDelete(e, c)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Edit Course Sheet */}
       <Sheet open={editOpen} onOpenChange={setEditOpen}>
         <SheetContent className="sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
+          <SheetHeader className="px-6 pt-6">
             <SheetTitle>Edit Course</SheetTitle>
             <SheetDescription>Update course details and settings.</SheetDescription>
           </SheetHeader>
           {editTarget && (
-            <form onSubmit={handleEdit} className="space-y-4 mt-6 px-1">
+            <form onSubmit={handleEdit} className="space-y-4 px-6 py-4">
               <div className="space-y-1.5">
                 <Label>Course Title</Label>
                 <Input value={editTarget.title} onChange={(e) => setEditTarget({ ...editTarget, title: e.target.value })} className="rounded-sm" required />
