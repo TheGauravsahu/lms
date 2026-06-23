@@ -27,6 +27,14 @@ const accountSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    xp: {
+      type: Number,
+      default: 0,
+    },
+    badges: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true },
 );

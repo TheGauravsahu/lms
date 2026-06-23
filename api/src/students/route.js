@@ -6,6 +6,55 @@ import { deleteCache, getCache, setCache } from "../config/redis.js";
 
 const r = express.Router();
 r.use(verifyToken);
+
+// Student gamification endpoints (accessible by USER and ADMIN roles)
+r.get(
+  "/leaderboard",
+  asyncHandler(async (req, res) => {
+    const LEADERBOARD_CACHE_KEY = "gamification:leaderboard";
+    const cached = await getCache(LEADERBOARD_CACHE_KEY);
+    if (cached) return res.success(200, cached, "Leaderboard fetched successfully.");
+
+    const users = await accountModel
+      .find({ role: "USER" })
+      .sort({ xp: -1 })
+      .limit(10)
+      .select("name email xp badges");
+
+    await setCache(LEADERBOARD_CACHE_KEY, users, 300); // 5 minutes cache
+    res.success(200, users, "Leaderboard fetched successfully.");
+  }),
+);
+
+r.post(
+  "/earn-xp",
+  asyncHandler(async (req, res) => {
+    const { xp, badge } = req.body;
+    const account_id = req.account.account_id;
+
+    const account = await accountModel.findById(account_id);
+    if (!account) return res.error(404, "Not Found", "Account not found.");
+
+    if (xp) {
+      account.xp = (account.xp || 0) + xp;
+    }
+
+    let unlockedBadge = null;
+    if (badge && !account.badges.includes(badge)) {
+      account.badges.push(badge);
+      unlockedBadge = badge;
+    }
+
+    await account.save();
+    
+    // Invalidate caches
+    await deleteCache("gamification:leaderboard");
+    await deleteCache("students:all");
+
+    res.success(200, { account, unlockedBadge }, "Rewards earned successfully.");
+  }),
+);
+
 r.use(verifyRoles("ADMIN"));
 
 const STUDENTS_CACHE_KEY = "students:all";

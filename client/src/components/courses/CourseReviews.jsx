@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { reviewApi } from "@/api/reviewApi";
 import { purchaseApi } from "@/api/purchaseApi";
+import { studentApi } from "@/api/studentApi";
 import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +11,7 @@ import { formatDate } from "@/lib/formatDate";
 export const CourseReviews = ({ courseId }) => {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN";
+  const earnMutation = studentApi.useEarnRewards();
 
   // Queries
   const { data: reviewData, isPending } = reviewApi.useGetCourseReviews(courseId);
@@ -39,6 +41,8 @@ export const CourseReviews = ({ courseId }) => {
         onSuccess: () => {
           setReviewText("");
           setIsEditing(false);
+          // Award rewards
+          earnMutation.mutate({ xp: 30, badge: "Course Reviewer" });
         },
       }
     );
@@ -74,7 +78,7 @@ export const CourseReviews = ({ courseId }) => {
   const hasReviewed = reviews.some((r) => r.account_id?._id === user?._id);
 
   // Can the user submit a review? (Must be logged in, not admin, has purchased, and not already reviewed OR in edit mode)
-  const canReview = user && isAdmin && isPurchased && (!hasReviewed || isEditing);
+  const canReview = user && !isAdmin && isPurchased && (!hasReviewed || isEditing);
 
   return (
     <div className="space-y-8 mt-12 border-t border-border/50 pt-8">

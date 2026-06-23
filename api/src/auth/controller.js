@@ -29,9 +29,9 @@ class AuthController {
 
   // user_account
   getAccountDetails = asyncHandler(async (req, res) => {
-    const account_id = req.body.account_id || req.account.account_id; // admin(boody)/user(req.account)
+    const {account_id} = req.body || req.account; // admin(boody)/user(req.account)
     const account = await accountModel.findById(account_id);
-    if (!account) return res.error(404, "Not Fund", "Account not found.");
+    if (!account) return res.error(404, "Not Found", "Account not found.");
     return res.success(200, account, "Account details fetched successfully.");
   });
 

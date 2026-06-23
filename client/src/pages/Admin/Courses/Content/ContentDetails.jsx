@@ -13,6 +13,7 @@ import ContentOptionsMenu from "@/components/admin/courses/content/content-optio
 import CustomVideoPlayer from "@/components/courses/CustomVideoPlayer";
 import PdfViewerDialog from "@/components/courses/PdfViewerDialog";
 import { progressApi } from "@/api/progressApi";
+import { studentApi } from "@/api/studentApi";
 import ContentComments from "@/components/courses/ContentComments";
 import EmptyState from "@/components/empty-state";
 import CertificateModal from "@/components/courses/CertificateModal";
@@ -31,6 +32,7 @@ const ContentDetails = () => {
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
 
   const { course_id } = useParams();
+  const earnMutation = studentApi.useEarnRewards();
   
   // Progress Query & Mutation
   const { data: progressData } = progressApi.useGetProgress(!isAdmin ? course_id : null);
@@ -60,10 +62,21 @@ const ContentDetails = () => {
 
   const handleToggleComplete = (contentId) => {
     if (toggleProgressMutation.isPending) return;
-    toggleProgressMutation.mutate({
-      course_id,
-      content_id: contentId,
-    });
+    const wasCompleted = completedSet.has(contentId);
+
+    toggleProgressMutation.mutate(
+      {
+        course_id,
+        content_id: contentId,
+      },
+      {
+        onSuccess: () => {
+          if (!wasCompleted) {
+            earnMutation.mutate({ xp: 20, badge: "Knowledge Seeker" });
+          }
+        },
+      }
+    );
   };
 
   return (

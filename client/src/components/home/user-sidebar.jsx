@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/auth";
 
@@ -32,6 +32,16 @@ const items = [
     title: "Quizzes",
     icon: Brain,
     href: "/quizzes",
+  },
+  {
+    title: "Playground",
+    icon: Code2,
+    href: "/sandbox",
+  },
+  {
+    title: "Leaderboard",
+    icon: Trophy,
+    href: "/leaderboard",
   },
   {
     title: "Settings",

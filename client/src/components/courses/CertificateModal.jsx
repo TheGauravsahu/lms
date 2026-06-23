@@ -85,7 +85,7 @@ export const CertificateModal = ({ isOpen, onClose, courseTitle }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl  h-[90vh] dark:bg-slate-900 dark:border-slate-800 dark:text-white rounded-xl shadow-2xl">
+      <DialogContent className="sm:max-w-2xl  h-[90vh] dark:bg-secondary dark:border-primary dark:text-white rounded-xl shadow-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-orange-500 font-bold text-xl">
             <Award className="w-6 h-6 animate-pulse" />

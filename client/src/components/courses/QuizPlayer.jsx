@@ -14,6 +14,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { quizApi } from "@/api/quizApi";
+import { studentApi } from "@/api/studentApi";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import { Brain } from "lucide-react";
 export const QuizPlayer = ({ quizId, title, onComplete }) => {
   const { data: quiz, isPending: loading, error } = quizApi.useGetQuizDetails(quizId);
   const questions = quiz?.questions || [];
+  const earnMutation = studentApi.useEarnRewards();
 
   // Quiz States
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -98,6 +100,16 @@ export const QuizPlayer = ({ quizId, title, onComplete }) => {
   const handleForceSubmit = () => {
     setQuizFinished(true);
     setConfirmSubmitOpen(false);
+    
+    // Earn rewards
+    const score = calculateScore();
+    const percentage = Math.round((score / questions.length) * 100);
+    if (percentage >= 70) {
+      earnMutation.mutate({ xp: 100, badge: "Quiz Champion" });
+    } else {
+      earnMutation.mutate({ xp: 50, badge: "Quiz Taker" });
+    }
+
     if (onComplete) {
       onComplete();
     }
@@ -110,6 +122,16 @@ export const QuizPlayer = ({ quizId, title, onComplete }) => {
   const confirmSubmit = () => {
     setQuizFinished(true);
     setConfirmSubmitOpen(false);
+
+    // Earn rewards
+    const score = calculateScore();
+    const percentage = Math.round((score / questions.length) * 100);
+    if (percentage >= 70) {
+      earnMutation.mutate({ xp: 100, badge: "Quiz Champion" });
+    } else {
+      earnMutation.mutate({ xp: 50, badge: "Quiz Taker" });
+    }
+
     if (onComplete) {
       onComplete();
     }

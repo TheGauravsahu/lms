@@ -69,4 +69,31 @@ export const studentApi = {
       },
     });
   },
+
+  useGetLeaderboard: () =>
+    useQuery({
+      queryKey: ["leaderboard"],
+      queryFn: async () => {
+        const { data } = await apiClient.get("/students/leaderboard");
+        return data.data;
+      },
+    }),
+
+  useEarnRewards: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["earn-rewards"],
+      onSuccess: (res) => {
+        if (res.unlockedBadge) {
+          toast.success(`🎉 New Badge Unlocked: ${res.unlockedBadge}!`);
+        }
+        queryClient.invalidateQueries({ queryKey: ["account-details"] });
+        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      },
+      mutationFn: async ({ xp, badge }) => {
+        const { data } = await apiClient.post("/students/earn-xp", { xp, badge });
+        return data.data;
+      },
+    });
+  },
 };

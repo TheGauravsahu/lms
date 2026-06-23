@@ -20,6 +20,8 @@ import StudentsList from "@/pages/Admin/Students/StudentsList";
 import StudentDashboard from "@/pages/Home/StudentDashboard";
 import AdminQuizzes from "@/pages/Admin/Quizzes/AdminQuizzes";
 import Quizzes from "@/pages/Home/Quizzes";
+import Sandbox from "@/pages/Home/Sandbox";
+import Leaderboard from "@/pages/Home/Leaderboard";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -56,6 +58,16 @@ export const router = createBrowserRouter([
             path: "quizzes",
             element: <UserLayout />,
             children: [{ index: true, element: <Quizzes /> }],
+          },
+          {
+            path: "sandbox",
+            element: <UserLayout />,
+            children: [{ index: true, element: <Sandbox /> }],
+          },
+          {
+            path: "leaderboard",
+            element: <UserLayout />,
+            children: [{ index: true, element: <Leaderboard /> }],
           },
         ],
       },

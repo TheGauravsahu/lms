@@ -3,6 +3,7 @@ import { authController } from "./controller.js";
 import { loginSchema, verifyOtpSchema } from "../schemas/auth.js";
 import { validate } from "../middleware/validate.js";
 import { authLimiter, authSpeedLimiter } from "../middleware/security.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const r = express.Router();
 
@@ -20,7 +21,7 @@ r.post(
   validate(verifyOtpSchema),
   authController.verifyOtpAndCreateAccount,
 );
-r.post("/account-details", authController.getAccountDetails);
-r.post("/edit-account", authController.editAccountDetails);
+r.post("/account-details", verifyToken, authController.getAccountDetails);
+r.post("/edit-account", verifyToken, authController.editAccountDetails);
 
 export default r;

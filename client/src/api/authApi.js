@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/axios";
 import { useAuthStore } from "@/store/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const authApi = {
@@ -51,6 +51,16 @@ export const authApi = {
       mutationFn: async (values) => {
         const { data } = await apiClient.post("/auth/edit-account", values);
         return data;
+      },
+    });
+  },
+
+  useGetAccountDetails: () => {
+    return useQuery({
+      queryKey: ["account-details"],
+      queryFn: async () => {
+        const { data } = await apiClient.post("/auth/account-details");
+        return data.data;
       },
     });
   },
