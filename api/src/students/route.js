@@ -2,7 +2,7 @@ import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { accountModel } from "../auth/model.js";
 import { verifyToken, verifyRoles } from "../middleware/auth.js";
-import { deleteCache, getCache, setCache } from "../config/redis.js";
+import { deleteCache, getCache, setCache, deletePattern } from "../config/redis.js";
 
 const r = express.Router();
 r.use(verifyToken);
@@ -49,7 +49,7 @@ r.post(
     
     // Invalidate caches
     await deleteCache("gamification:leaderboard");
-    await deleteCache("students:all");
+    await deletePattern("students:*");
 
     res.success(200, { account, unlockedBadge }, "Rewards earned successfully.");
   }),
@@ -60,20 +60,71 @@ r.use(verifyRoles("ADMIN"));
 const STUDENTS_CACHE_KEY = "students:all";
 const STUDENT_TTL = 60 * 10; // 10 minutes
 
-// GET /api/students — list all users with role USER
+// GET /api/students — list users with role USER (optionally paginated & searched)
 r.get(
   "/",
   asyncHandler(async (req, res) => {
-    const cached = await getCache(STUDENTS_CACHE_KEY);
-    if (cached) return res.success(200, cached, "Students fetched successfully.");
+    const { page, limit, search } = req.query;
 
-    const students = await accountModel
-      .find({ role: "USER" })
-      .sort({ createdAt: -1 })
-      .select("-tokenVersion");
+    let query = { role: "USER" };
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { mobile_no: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
 
-    await setCache(STUDENTS_CACHE_KEY, students, STUDENT_TTL);
-    res.success(200, students, "Students fetched successfully.");
+    if (page && limit) {
+      const p = Number(page) || 1;
+      const l = Number(limit) || 10;
+      const skip = (p - 1) * l;
+
+      const cacheKey = `students:page:${p}:limit:${l}:search:${search || ""}`;
+      const cached = await getCache(cacheKey);
+      if (cached) return res.success(200, cached, "Students fetched successfully.");
+
+      const [students, total, active, blocked, unverified] = await Promise.all([
+        accountModel
+          .find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(l)
+          .select("-tokenVersion"),
+        accountModel.countDocuments(query),
+        accountModel.countDocuments({ role: "USER", status: "ACTIVE" }),
+        accountModel.countDocuments({ role: "USER", status: "BLOCKED" }),
+        accountModel.countDocuments({ role: "USER", status: "UNVERIFIED" }),
+      ]);
+
+      const result = {
+        students,
+        total,
+        page: p,
+        limit: l,
+        stats: {
+          total: active + blocked + unverified,
+          active,
+          blocked,
+          unverified,
+        },
+      };
+
+      await setCache(cacheKey, result, 300); // 5 minutes TTL
+      return res.success(200, result, "Students fetched successfully.");
+    } else {
+      const cacheKey = search ? `students:search:${search}` : "students:all";
+      const cached = await getCache(cacheKey);
+      if (cached) return res.success(200, cached, "Students fetched successfully.");
+
+      const students = await accountModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .select("-tokenVersion");
+
+      await setCache(cacheKey, students, 600); // 10 minutes TTL
+      res.success(200, students, "Students fetched successfully.");
+    }
   }),
 );
 
@@ -97,7 +148,7 @@ r.post(
       status: "ACTIVE",
     });
 
-    await deleteCache(STUDENTS_CACHE_KEY);
+    await deletePattern("students:*");
     res.success(201, student, "Student created successfully.");
   }),
 );
@@ -119,7 +170,7 @@ r.put(
       { new: true, runValidators: true },
     );
 
-    await deleteCache(STUDENTS_CACHE_KEY);
+    await deletePattern("students:*");
     res.success(200, updated, "Student updated successfully.");
   }),
 );
@@ -134,7 +185,7 @@ r.delete(
       return res.error(404, "Not Found", "Student not found.");
 
     await accountModel.findByIdAndDelete(id);
-    await deleteCache(STUDENTS_CACHE_KEY);
+    await deletePattern("students:*");
     res.success(200, null, "Student deleted successfully.");
   }),
 );

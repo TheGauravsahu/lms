@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { studentApi } from "@/api/studentApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,12 +57,29 @@ const StatusBadge = ({ status }) => {
 };
 
 const StudentsList = () => {
-  const { data: students, isPending, isError } = studentApi.useGetAllStudents();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  // Debounce search query to prevent backend spam
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const { data, isPending, isError } = studentApi.useGetAllStudents({
+    page,
+    limit,
+    search: debouncedSearch,
+  });
+
   const addStudent = studentApi.useAddStudent();
   const editStudent = studentApi.useEditStudent();
   const deleteStudent = studentApi.useDeleteStudent();
-
-  const [search, setSearch] = useState("");
 
   // Add dialog state
   const [addOpen, setAddOpen] = useState(false);
@@ -76,14 +93,10 @@ const StudentsList = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const filteredStudents = students
-    ? students.filter(
-        (s) =>
-          s.name.toLowerCase().includes(search.toLowerCase()) ||
-          s.mobile_no.includes(search) ||
-          (s.email || "").toLowerCase().includes(search.toLowerCase()),
-      )
-    : [];
+  const students = data?.students || [];
+  const stats = data?.stats || { total: 0, active: 0, blocked: 0, unverified: 0 };
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / limit);
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -148,10 +161,10 @@ const StudentsList = () => {
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Students", value: students.length, icon: Users, color: "text-orange-500" },
-          { label: "Active", value: students.filter((s) => s.status === "ACTIVE").length, icon: Shield, color: "text-green-500" },
-          { label: "Blocked", value: students.filter((s) => s.status === "BLOCKED").length, icon: Shield, color: "text-red-500" },
-          { label: "Unverified", value: students.filter((s) => s.status === "UNVERIFIED").length, icon: Shield, color: "text-yellow-500" },
+          { label: "Total Students", value: stats.total, icon: Users, color: "text-orange-500" },
+          { label: "Active", value: stats.active, icon: Shield, color: "text-green-500" },
+          { label: "Blocked", value: stats.blocked, icon: Shield, color: "text-red-500" },
+          { label: "Unverified", value: stats.unverified, icon: Shield, color: "text-yellow-500" },
         ].map((stat) => (
           <div key={stat.label} className="bg-card border rounded-xl p-4 shadow-xs">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -187,14 +200,14 @@ const StudentsList = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStudents.length === 0 ? (
+              {students.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                     No students found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredStudents.map((s) => (
+                students.map((s) => (
                   <TableRow key={s._id}>
                     <TableCell className="font-semibold">{s.name}</TableCell>
                     <TableCell>
@@ -229,6 +242,33 @@ const StudentsList = () => {
             </TableBody>
           </Table>
         </div>
+
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 p-4 border-t">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-sm px-4 cursor-pointer"
+            >
+              Previous
+            </Button>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="rounded-sm px-4 cursor-pointer"
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Add Student Dialog */}

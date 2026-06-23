@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { verifyToken, verifyRoles } from "../middleware/auth.js";
 import { PeerReview } from "./model.js";
 import { accountModel } from "../auth/model.js";
-import { deleteCache } from "../config/redis.js";
+import { deleteCache, getCache, setCache, deletePattern } from "../config/redis.js";
 
 const r = express.Router();
 r.use(verifyToken);
@@ -13,6 +13,10 @@ r.get(
   "/",
   asyncHandler(async (req, res) => {
     const { language, status, page = 1, limit = 20 } = req.query;
+    const cacheKey = `peerreviews:list:lang:${language || "all"}:status:${status || "all"}:page:${page}:limit:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Peer reviews fetched.");
+
     const filter = {};
     if (language) filter.language = language;
     if (status) filter.status = status;
@@ -28,7 +32,9 @@ r.get(
       PeerReview.countDocuments(filter),
     ]);
 
-    res.success(200, { reviews, total }, "Peer reviews fetched.");
+    const result = { reviews, total };
+    await setCache(cacheKey, result, 300); // 5 minutes TTL
+    res.success(200, result, "Peer reviews fetched.");
   })
 );
 
@@ -36,11 +42,17 @@ r.get(
 r.get(
   "/:reviewId",
   asyncHandler(async (req, res) => {
-    const review = await PeerReview.findById(req.params.reviewId)
+    const { reviewId } = req.params;
+    const cacheKey = `peerreviews:review:${reviewId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Peer review fetched.");
+
+    const review = await PeerReview.findById(reviewId)
       .populate("submitterId", "name email xp badges")
       .populate("comments.authorId", "name email xp badges");
 
     if (!review) return res.error(404, "Not Found", "Peer review not found.");
+    await setCache(cacheKey, review, 300); // 5 minutes TTL
     res.success(200, review, "Peer review fetched.");
   })
 );
@@ -61,6 +73,7 @@ r.post(
     });
 
     await review.populate("submitterId", "name email");
+    await deletePattern("peerreviews:list:*");
     res.success(201, review, "Code submitted for peer review.");
   })
 );
@@ -90,6 +103,8 @@ r.post(
 
     await review.populate("comments.authorId", "name email xp badges");
     const newComment = review.comments[review.comments.length - 1];
+    await deleteCache(`peerreviews:review:${reviewId}`);
+    await deletePattern("peerreviews:list:*");
     res.success(201, newComment, "Comment added. +30 XP earned!");
   })
 );
@@ -108,6 +123,8 @@ r.patch(
 
     review.status = "closed";
     await review.save();
+    await deleteCache(`peerreviews:review:${reviewId}`);
+    await deletePattern("peerreviews:list:*");
     res.success(200, review, "Review closed.");
   })
 );
@@ -130,6 +147,8 @@ r.post(
 
     review.rating = rating;
     await review.save();
+    await deleteCache(`peerreviews:review:${reviewId}`);
+    await deletePattern("peerreviews:list:*");
     res.success(200, review, "Review rated.");
   })
 );
@@ -141,6 +160,8 @@ r.delete(
   asyncHandler(async (req, res) => {
     const review = await PeerReview.findByIdAndDelete(req.params.reviewId);
     if (!review) return res.error(404, "Not Found", "Review not found.");
+    await deleteCache(`peerreviews:review:${req.params.reviewId}`);
+    await deletePattern("peerreviews:list:*");
     res.success(200, null, "Review deleted.");
   })
 );

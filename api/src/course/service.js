@@ -1,20 +1,55 @@
-import { deleteCache, getCache, setCache } from "../config/redis.js";
+import { deleteCache, getCache, setCache, deletePattern } from "../config/redis.js";
 import { courseContentModel } from "./models/content.js";
 import { courseModel } from "./models/course.js";
 import { courseFolderModel } from "./models/folder.js";
 
 class CourseService {
-  getAllCourses = async () => {
-    const cacheKey = "courses:all";
-    const cachedCourses = await getCache(cacheKey);
+  getAllCourses = async (options = {}) => {
+    const { page, limit, search, filter } = options;
 
-    if (!cachedCourses) {
+    if (!page && !limit && !search && !filter) {
+      const cacheKey = "courses:all";
+      const cachedCourses = await getCache(cacheKey);
+
+      if (cachedCourses) return cachedCourses;
+
       const courses = await courseModel.find().populate("thumbnail", "url");
       await setCache(cacheKey, courses, 60 * 60);
       return courses;
     }
 
-    return cachedCourses;
+    const p = Number(page) || 1;
+    const l = Number(limit) || 12;
+    const skip = (p - 1) * l;
+
+    // Build query
+    let query = {};
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
+    }
+    if (filter === "trending") {
+      query.is_trending = true;
+    } else if (filter === "new") {
+      query.is_new = true;
+    } else if (filter === "featured") {
+      query.is_featured = true;
+    }
+
+    const cacheKey = `courses:page:${p}:limit:${l}:search:${search || ""}:filter:${filter || ""}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) return cachedData;
+
+    const [courses, total] = await Promise.all([
+      courseModel.find(query)
+        .populate("thumbnail", "url")
+        .skip(skip)
+        .limit(l),
+      courseModel.countDocuments(query),
+    ]);
+
+    const result = { courses, total, page: p, limit: l };
+    await setCache(cacheKey, result, 300); // 5 minutes TTL
+    return result;
   };
 
   getCourseDetails = async (course_id) => {
@@ -61,7 +96,7 @@ class CourseService {
       new: true,
       runValidators: true,
     });
-    await deleteCache("courses:all");
+    await deletePattern("courses:*");
     await deleteCache(`course:${course_id}`);
     return updatedCourse;
   };
@@ -202,7 +237,7 @@ class CourseService {
     }
     await courseFolderModel.deleteMany({ course_id });
     await courseModel.findByIdAndDelete(course_id);
-    await deleteCache("courses:all");
+    await deletePattern("courses:*");
     await deleteCache(`course:${course_id}`);
     return true;
   };

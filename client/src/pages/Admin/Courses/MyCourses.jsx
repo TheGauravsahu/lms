@@ -38,7 +38,13 @@ const COURSE_STATUS_OPTIONS = ["DRAFT", "PUBLISHED", "ARCHIVED"];
 
 const MyCourses = () => {
   const navigate = useNavigate();
-  const { data, isPending, error } = courseApi.useGetAllCourses();
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  const { data, isPending, error } = courseApi.useGetAllCourses({ page, limit });
+
+  const courses = data?.courses || [];
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / limit);
   const editCourseMutation = courseApi.useEditCourse();
   const deleteCourseMutation = courseApi.useDeleteCourse();
 
@@ -108,7 +114,7 @@ const MyCourses = () => {
           <span className="flex items-center">
             All Courses
             <div className="flex items-center justify-center ml-1 bg-secondary rounded-full text-xs p-1 h-5 w-5">
-              {data.length}
+              {total}
             </div>
           </span>
         </div>
@@ -133,7 +139,7 @@ const MyCourses = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((c) => (
+            {courses.map((c) => (
               <TableRow key={c._id}>
                 <TableCell
                   onClick={() => navigate("/admin/courses/" + c._id)}
@@ -183,6 +189,33 @@ const MyCourses = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="rounded-sm px-4 cursor-pointer"
+          >
+            Previous
+          </Button>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="rounded-sm px-4 cursor-pointer"
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
       {/* Edit Course Sheet */}
       <Sheet open={editOpen} onOpenChange={setEditOpen}>

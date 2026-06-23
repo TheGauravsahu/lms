@@ -21,7 +21,8 @@ class CourseController {
   });
 
   getAllCourses = asyncHandler(async (req, res) => {
-    const data = await courseService.getAllCourses();
+    const { page, limit, search, filter } = req.query;
+    const data = await courseService.getAllCourses({ page, limit, search, filter });
     res.success(200, data, "Courses fetched successfully");
   });
 

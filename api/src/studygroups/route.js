@@ -4,6 +4,7 @@ import { verifyToken, verifyRoles } from "../middleware/auth.js";
 import { StudyGroup, GroupMessage } from "./model.js";
 import { accountModel } from "../auth/model.js";
 import crypto from "crypto";
+import { deleteCache, getCache, setCache, deletePattern } from "../config/redis.js";
 
 const r = express.Router();
 r.use(verifyToken);
@@ -13,6 +14,10 @@ r.get(
   "/",
   asyncHandler(async (req, res) => {
     const { courseId, page = 1, limit = 20 } = req.query;
+    const cacheKey = `studygroups:list:course:${courseId || "all"}:page:${page}:limit:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Study groups fetched.");
+
     const filter = {};
     if (courseId) filter.courseId = courseId;
 
@@ -28,7 +33,9 @@ r.get(
       StudyGroup.countDocuments(filter),
     ]);
 
-    res.success(200, { groups, total }, "Study groups fetched.");
+    const result = { groups, total };
+    await setCache(cacheKey, result, 300); // 5 minutes TTL
+    res.success(200, result, "Study groups fetched.");
   })
 );
 
@@ -37,10 +44,16 @@ r.get(
   "/my",
   asyncHandler(async (req, res) => {
     const userId = req.account.account_id;
+    const cacheKey = `studygroups:my:${userId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "My study groups fetched.");
+
     const groups = await StudyGroup.find({ members: userId })
       .populate("createdBy", "name email")
       .populate("courseId", "title")
       .populate("members", "name email");
+
+    await setCache(cacheKey, groups, 300); // 5 minutes TTL
     res.success(200, groups, "My study groups fetched.");
   })
 );
@@ -49,12 +62,18 @@ r.get(
 r.get(
   "/:groupId",
   asyncHandler(async (req, res) => {
-    const group = await StudyGroup.findById(req.params.groupId)
+    const { groupId } = req.params;
+    const cacheKey = `studygroups:group:${groupId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Study group fetched.");
+
+    const group = await StudyGroup.findById(groupId)
       .populate("createdBy", "name email xp badges")
       .populate("courseId", "title")
       .populate("members", "name email xp badges");
 
     if (!group) return res.error(404, "Not Found", "Study group not found.");
+    await setCache(cacheKey, group, 300); // 5 minutes TTL
     res.success(200, group, "Study group fetched.");
   })
 );
@@ -83,6 +102,8 @@ r.post(
     });
 
     await group.populate("createdBy", "name email");
+    await deletePattern("studygroups:list:*");
+    await deleteCache(`studygroups:my:${userId}`);
     res.success(201, group, "Study group created.");
   })
 );
@@ -106,6 +127,9 @@ r.post(
 
     group.members.push(userId);
     await group.save();
+    await deleteCache(`studygroups:group:${groupId}`);
+    await deleteCache(`studygroups:my:${userId}`);
+    await deletePattern("studygroups:list:*");
     res.success(200, null, "Joined study group successfully.");
   })
 );
@@ -124,6 +148,9 @@ r.post(
 
     group.members.pull(userId);
     await group.save();
+    await deleteCache(`studygroups:group:${groupId}`);
+    await deleteCache(`studygroups:my:${userId}`);
+    await deletePattern("studygroups:list:*");
     res.success(200, null, "Left study group.");
   })
 );
@@ -141,6 +168,10 @@ r.get(
     if (!group.members.map(String).includes(String(userId)))
       return res.error(403, "Forbidden", "Join the group to view messages.");
 
+    const cacheKey = `studygroups:messages:${groupId}:page:${page}:limit:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Messages fetched.");
+
     const skip = (Number(page) - 1) * Number(limit);
     const messages = await GroupMessage.find({ groupId })
       .sort({ createdAt: 1 })
@@ -148,6 +179,7 @@ r.get(
       .limit(Number(limit))
       .populate("authorId", "name email");
 
+    await setCache(cacheKey, messages, 300); // 5 minutes TTL
     res.success(200, messages, "Messages fetched.");
   })
 );
@@ -169,6 +201,7 @@ r.post(
 
     const msg = await GroupMessage.create({ groupId, message, authorId: userId });
     await msg.populate("authorId", "name email");
+    await deletePattern(`studygroups:messages:${groupId}:*`);
     res.success(201, msg, "Message sent.");
   })
 );
@@ -189,6 +222,10 @@ r.delete(
 
     await GroupMessage.deleteMany({ groupId });
     await StudyGroup.findByIdAndDelete(groupId);
+    await deleteCache(`studygroups:group:${groupId}`);
+    await deletePattern(`studygroups:messages:${groupId}:*`);
+    await deletePattern("studygroups:list:*");
+    await deletePattern("studygroups:my:*");
     res.success(200, null, "Group deleted.");
   })
 );

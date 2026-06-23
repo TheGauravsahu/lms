@@ -19,3 +19,14 @@ export const setCache = async (key, value, ttl = 600) => {
 export const deleteCache = async (key) => {
   await redis.del(key);
 };
+
+export const deletePattern = async (pattern) => {
+  try {
+    const keys = await redis.keys(pattern);
+    if (keys && keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (error) {
+    console.error("Redis deletePattern error:", error);
+  }
+};

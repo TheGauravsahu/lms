@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { courseApi } from "@/api/courseApi";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
@@ -9,25 +9,35 @@ import { useNavigate } from "react-router";
 
 export const AllCourses = () => {
   const navigate = useNavigate();
-  const { isPending, isError, data: courses = [] } = courseApi.useGetAllCourses();
 
-  // Search & Filter states
+  // Search, Filter & Pagination states
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const limit = 8;
+
+  // Debounce search query to prevent excessive backend hits
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const { isPending, isError, data } = courseApi.useGetAllCourses({
+    page,
+    limit,
+    search: debouncedSearch,
+    filter: activeFilter,
+  });
+
+  const courses = data?.courses || [];
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / limit);
 
   if (isError) return <ErrorOccured />;
-
-  // Dynamic Filtering Logic
-  const filteredCourses = courses.filter((c) => {
-    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    if (activeFilter === "all") return matchesSearch;
-    if (activeFilter === "trending") return matchesSearch && c.is_trending;
-    if (activeFilter === "new") return matchesSearch && c.is_new;
-    if (activeFilter === "featured") return matchesSearch && c.is_featured;
-    
-    return matchesSearch;
-  });
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -73,7 +83,10 @@ export const AllCourses = () => {
             return (
               <button
                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
+                onClick={() => {
+                  setActiveFilter(filter.id);
+                  setPage(1);
+                }}
                 className={`px-3.5 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
                   isActive
                     ? "bg-orange-500 border-orange-500 text-white shadow-sm shadow-orange-500/10"
@@ -99,7 +112,7 @@ export const AllCourses = () => {
               />
             ))}
           </div>
-        ) : filteredCourses.length === 0 ? (
+        ) : courses.length === 0 ? (
           <EmptyState
             title="No Matching Courses"
             description="We couldn't find any courses matching your search query or filter parameters. Try another name or keyword!"
@@ -107,7 +120,7 @@ export const AllCourses = () => {
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredCourses.map((c) => {
+            {courses.map((c) => {
               const showBadge = c.is_trending || c.is_featured || c.is_new;
               const badgeText = c.is_trending ? "Trending" : c.is_featured ? "Featured" : "New";
 
@@ -148,11 +161,11 @@ export const AllCourses = () => {
                       {/* Meta information row */}
                       <div className="flex items-center gap-3 text-[9px] text-muted-foreground font-semibold">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-orange-500" />
+                          <Clock className="w-3.5 h-3.5 text-orange-500" />
                           {c.validity} Days Access
                         </span>
                         <span className="flex items-center gap-1">
-                          <Layers className="w-3 h-3 text-orange-500" />
+                          <Layers className="w-3.5 h-3.5 text-orange-500" />
                           Syllabus
                         </span>
                       </div>
@@ -180,6 +193,33 @@ export const AllCourses = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-xl px-4 cursor-pointer"
+            >
+              Previous
+            </Button>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="rounded-xl px-4 cursor-pointer"
+            >
+              Next
+            </Button>
           </div>
         )}
       </div>

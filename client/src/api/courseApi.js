@@ -15,11 +15,11 @@ export const courseApi = {
     });
   },
 
-  useGetAllCourses: () => {
+  useGetAllCourses: (params) => {
     return useQuery({
-      queryKey: ["all-courses"],
+      queryKey: ["all-courses", params],
       queryFn: async () => {
-        const { data } = await apiClient.get("/courses/all-courses");
+        const { data } = await apiClient.get("/courses/all-courses", { params });
         return data.data;
       },
     });

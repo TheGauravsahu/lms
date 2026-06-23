@@ -4,12 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const studentApi = {
-  useGetAllStudents: () =>
+  useGetAllStudents: (params) =>
     useQuery({
-      queryKey: ["all-students"],
+      queryKey: ["all-students", params],
       queryFn: async () => {
         const token = useAuthStore.getState().token;
         const { data } = await apiClient.get("/students", {
+          params,
           headers: { Authorization: `Bearer ${token}` },
         });
         return data.data;

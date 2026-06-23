@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { verifyToken, verifyRoles } from "../middleware/auth.js";
 import { ForumPost, ForumReply } from "./model.js";
 import { accountModel } from "../auth/model.js";
-import { deleteCache } from "../config/redis.js";
+import { deleteCache, getCache, setCache, deletePattern } from "../config/redis.js";
 
 const r = express.Router();
 
@@ -14,6 +14,10 @@ r.get(
   "/",
   asyncHandler(async (req, res) => {
     const { courseId, sort = "latest", page = 1, limit = 20 } = req.query;
+    const cacheKey = `forums:list:course:${courseId || "all"}:sort:${sort}:page:${page}:limit:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.success(200, cached, "Forum posts fetched.");
+
     const filter = {};
     if (courseId) filter.courseId = courseId;
     if (sort === "unanswered") filter.isAnswered = false;
@@ -34,11 +38,9 @@ r.get(
       ForumPost.countDocuments(filter),
     ]);
 
-    res.success(
-      200,
-      { posts, total, page: Number(page), limit: Number(limit) },
-      "Forum posts fetched.",
-    );
+    const result = { posts, total, page: Number(page), limit: Number(limit) };
+    await setCache(cacheKey, result, 300); // 5 minutes TTL
+    res.success(200, result, "Forum posts fetched.");
   }),
 );
 
@@ -47,6 +49,14 @@ r.get(
   "/:postId",
   asyncHandler(async (req, res) => {
     const { postId } = req.params;
+    const cacheKey = `forums:post:${postId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      // Increment views in background
+      ForumPost.findByIdAndUpdate(postId, { $inc: { views: 1 } }).exec();
+      return res.success(200, cached, "Forum post fetched.");
+    }
+
     const post = await ForumPost.findByIdAndUpdate(
       postId,
       { $inc: { views: 1 } },
@@ -61,7 +71,9 @@ r.get(
       .sort({ isAccepted: -1, upvotes: -1, createdAt: 1 })
       .populate("authorId", "name email xp badges");
 
-    res.success(200, { post, replies }, "Forum post fetched.");
+    const result = { post, replies };
+    await setCache(cacheKey, result, 300); // 5 minutes TTL
+    res.success(200, result, "Forum post fetched.");
   }),
 );
 
@@ -85,6 +97,7 @@ r.post(
     });
 
     await post.populate("authorId", "name email");
+    await deletePattern("forums:list:*");
     res.success(201, post, "Forum post created.");
   }),
 );
@@ -109,6 +122,8 @@ r.post(
 
     await ForumPost.findByIdAndUpdate(postId, { $inc: { replyCount: 1 } });
     await reply.populate("authorId", "name email xp badges");
+    await deleteCache(`forums:post:${postId}`);
+    await deletePattern("forums:list:*");
     res.success(201, reply, "Reply added.");
   }),
 );
@@ -129,6 +144,8 @@ r.post(
       post.upvotes.push(userId);
     }
     await post.save();
+    await deleteCache(`forums:post:${postId}`);
+    await deletePattern("forums:list:*");
     res.success(
       200,
       { upvotes: post.upvotes.length, hasUpvoted: !hasUpvoted },
@@ -153,6 +170,7 @@ r.post(
       reply.upvotes.push(userId);
     }
     await reply.save();
+    await deleteCache(`forums:post:${postId}`);
     res.success(
       200,
       { upvotes: reply.upvotes.length, hasUpvoted: !hasUpvoted },
@@ -186,6 +204,8 @@ r.post(
     );
     await ForumPost.findByIdAndUpdate(postId, { isAnswered: true });
 
+    await deleteCache(`forums:post:${postId}`);
+    await deletePattern("forums:list:*");
     res.success(200, reply, "Reply accepted as answer.");
   }),
 );
@@ -207,6 +227,8 @@ r.delete(
 
     await ForumReply.deleteMany({ postId });
     await ForumPost.findByIdAndDelete(postId);
+    await deleteCache(`forums:post:${postId}`);
+    await deletePattern("forums:list:*");
     res.success(200, null, "Post deleted.");
   }),
 );
@@ -221,6 +243,8 @@ r.patch(
     if (!post) return res.error(404, "Not Found", "Post not found.");
     post.isPinned = !post.isPinned;
     await post.save();
+    await deleteCache(`forums:post:${postId}`);
+    await deletePattern("forums:list:*");
     res.success(
       200,
       { isPinned: post.isPinned },
