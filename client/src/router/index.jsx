@@ -11,7 +11,7 @@ import FolderDetails from "@/pages/Admin/Courses/Folder/FolderDetails";
 import NewContent from "@/pages/Admin/Courses/Content/NewContent";
 import HomePage from "@/pages/Home/HomePage";
 import UserLayout from "@/pages/Home/UserLayout";
-import CoursesList from "@/components/home/courses-list";
+import AllCourses from "@/pages/Home/AllCourses";
 import MyCourse from "@/pages/MyCourse/MyCourse";
 import { AuthGuard, AdminGuard } from "@/components/auth/AuthGuard";
 import ProfileSettings from "@/pages/Home/ProfileSettings";
@@ -64,7 +64,7 @@ export const router = createBrowserRouter([
         path: "all-courses",
         element: <UserLayout />,
         children: [
-          { index: true, element: <CoursesList /> },
+          { index: true, element: <AllCourses /> },
           {
             path: ":course_id",
             element: <CourseDetailsLayout />,

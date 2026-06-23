@@ -108,26 +108,26 @@ const StudentDashboard = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Welcome Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-red-600 p-8 text-white shadow-lg">
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 text-orange-200 text-sm font-medium mb-2">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-red-600 p-6 sm:p-8 text-white shadow-lg border border-orange-400/25">
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center gap-2 text-orange-200 text-xs font-semibold tracking-wider uppercase">
             <LayoutDashboard className="w-4 h-4" />
             Student Dashboard
           </div>
-          <h1 className="text-3xl font-extrabold">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
             {greeting}, {user?.name?.split(" ")[0]}! 👋
           </h1>
-          <p className="text-orange-100 mt-2 max-w-md">
+          <p className="text-orange-100 mt-2 text-xs sm:text-sm max-w-md leading-relaxed">
             Keep up the great work! You have{" "}
-            <span className="font-bold text-white">
+            <span className="font-extrabold text-white">
               {courses?.length ?? 0} course{courses?.length !== 1 ? "s" : ""}
             </span>{" "}
-            enrolled. Let's keep learning.
+            enrolled. Let's unlock new milestones today.
           </p>
           <Button
             onClick={() => navigate("/all-courses")}
             variant="secondary"
-            className="mt-5 border-white   cursor-pointer rounded-sm"
+            className="mt-3 border-none bg-white text-orange-600 hover:bg-orange-50 font-bold text-xs h-9 px-4 cursor-pointer rounded-xl transition-all shadow-sm"
           >
             Explore More Courses <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
@@ -138,40 +138,42 @@ const StudentDashboard = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
             label: "Enrolled Courses",
-            value: enrolledCount || "—",
+            value: enrolledCount || "0",
             icon: BookOpen,
             color: "text-orange-500",
-            bg: "bg-orange-50 dark:bg-orange-950/30",
+            bg: "bg-orange-500/10",
           },
           {
             label: "In Progress",
-            value: isPending || isProgressPending ? "—" : inProgressCount,
+            value: isPending || isProgressPending ? "0" : inProgressCount,
             icon: GraduationCap,
-            color: "text-blue-500",
-            bg: "bg-blue-50 dark:bg-blue-950/30",
+            color: "text-amber-500",
+            bg: "bg-amber-500/10",
           },
           {
             label: "Completed",
-            value: isPending || isProgressPending ? "—" : completedCount,
+            value: isPending || isProgressPending ? "0" : completedCount,
             icon: GraduationCap,
             color: "text-green-500",
-            bg: "bg-green-50 dark:bg-green-950/30",
+            bg: "bg-green-500/10",
           },
         ].map((s) => (
           <div
             key={s.label}
-            className="bg-card border rounded-xl p-5 shadow-xs"
+            className="bg-card border border-border/50 rounded-2xl p-5 shadow-xs hover:border-orange-500/30 hover:shadow-sm transition-all duration-300 flex items-center gap-4 group"
           >
-            <div className={`p-2.5 rounded-lg ${s.bg} w-fit`}>
-              <s.icon className={`w-5 h-5 ${s.color}`} />
+            <div className={`p-3 rounded-xl ${s.bg} ${s.color} shrink-0`}>
+              <s.icon className="w-6 h-6" />
             </div>
-            <div className="mt-3 text-2xl font-extrabold">{s.value}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {s.label}
+            <div>
+              <div className="text-2xl font-black text-foreground leading-none">{s.value}</div>
+              <div className="text-xs text-muted-foreground font-semibold mt-1">
+                {s.label}
+              </div>
             </div>
           </div>
         ))}
