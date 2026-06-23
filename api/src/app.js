@@ -20,6 +20,7 @@ import reviewRoutes from "./reviews/route.js";
 import quizRoutes from "./quiz/route.js";
 import { apiReference } from "@scalar/express-api-reference";
 import { openApiSpec } from "./docs/openapi.js";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -103,9 +104,18 @@ app.use(
   }),
 );
 
-app.get("/health", (req, res) =>
-  res.success(200, null, "Server is running successfully."),
-);
+app.get("/api/health", async (req, res) => {
+  try {
+    const dbStatus = mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
+    
+    res.status(200).json({
+      status: "UP",
+      database: dbStatus
+    });
+  } catch (error) {
+    res.status(500).json({ status: "DOWN", error: error.message });
+  }
+});
 
 app.use(errorHandler);
 
