@@ -15,74 +15,62 @@ const CourseBanner = ({ data }) => {
   const user = useAuthStore((state) => state.user);
   const { data: isPurchased } = purchaseApi.useCheckPurchase(data.overview._id);
 
-  //   const banners = ["/course_banner_bg_v2.png", "/course_banner_bg.png"];
-  //   const [bannerSrc] = useState(() => {
-  //     return banners[Math.floor(Math.random() * banners.length)];
-  //   });
-
   return (
-    <div className="relative h-52 w-full border rounded-lg my-4">
-      <div className="rounded-lg overflow-hidden h-52 w-full flex items-center justify-center bg-gradient-to-t from-primary/40 to-primary">
-        {/* <img
-          src={bannerSrc}
-          alt="banner"
-          className="w-full h-full object-cover"
-        /> */}
-      </div>
+    <div className="relative min-h-[13rem] w-full border rounded-lg my-4 bg-gradient-to-t from-primary/40 to-primary text-white p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6 overflow-hidden">
+      {/* Decorative background overlay */}
+      <div className="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none" />
 
-      <div className="absolute top-0 left-0 text-white p-8 flex justify-between w-full">
+      <div className="relative z-10 flex-1 flex flex-col justify-between gap-4">
+        <div className="space-y-2">
+          <h2 className="font-semibold text-2xl md:text-4xl leading-tight">{data.overview.title}</h2>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs md:text-sm opacity-90">
+            <h3>Created: {formatDate(data.overview.createdAt)}</h3>
+            {isAdmin && <h3>Status: {data.overview.status}</h3>}
+          </div>
+        </div>
+
         <div>
-          <h2 className="font-semibold text-4xl">{data.overview.title}</h2>
-          <h3 className="text-sm mt-3">
-            Created: {formatDate(data.overview.createdAt)}
-          </h3>
-          {isAdmin && (
-            <h3 className="text-sm">Status: {data.overview.status}</h3>
-          )}
-
-          <div className="flex mt-3">
-            <h2 className="font-semibold text-4xl">
-              ₹{data.overview.offer_price}
-            </h2>
-            <h2 className="font-semibold text-3xl line-through ml-4">
-              {data.overview.original_price}
-            </h2>
+          <div className="flex items-baseline gap-3">
+            <h2 className="font-bold text-3xl md:text-4xl">₹{data.overview.offer_price}</h2>
+            <h2 className="font-semibold text-xl md:text-2xl line-through opacity-70">{data.overview.original_price}</h2>
           </div>
 
-          {!user ? (
-            <LoginModal>
-              <Button
-                variant="secondary"
-                className="w-full mt-2 cursor-pointer text-orange-600 bg-orange-100 hover:bg-orange-100"
-              >
-                Buy Now <ArrowRight />
-              </Button>
-            </LoginModal>
-          ) : (
-            !isAdmin && (
-              <>
-                {isPurchased ? (
-                  <div
-                    className={`${buttonVariants({ variant: "ghost" })} text-orange-600 bg-orange-100 hover:bg-orange-100 hover:text-orange-600 rounded-sm w-full my-2 cursor-pointer`}
-                  >
-                    <Sparkle />
-                    Purchased
-                  </div>
-                ) : (
-                  <PurchaseModel course={data.overview} />
-                )}
-              </>
-            )
-          )}
+          <div className="w-full sm:w-fit min-w-[12rem] mt-3">
+            {!user ? (
+              <LoginModal>
+                <Button
+                  variant="secondary"
+                  className="w-full cursor-pointer text-orange-600 bg-orange-100 hover:bg-orange-200"
+                >
+                  Buy Now <ArrowRight />
+                </Button>
+              </LoginModal>
+            ) : (
+              !isAdmin && (
+                <>
+                  {isPurchased ? (
+                    <div
+                      className={`${buttonVariants({ variant: "ghost" })} text-orange-600 bg-orange-100 hover:bg-orange-200 hover:text-orange-600 rounded-sm w-full cursor-pointer`}
+                    >
+                      <Sparkle />
+                      Purchased
+                    </div>
+                  ) : (
+                    <PurchaseModel course={data.overview} />
+                  )}
+                </>
+              )
+            )}
+          </div>
         </div>
+      </div>
 
-        <div className="">
-          <img
-            src={data.overview.thumbnail.url}
-            alt={data.overview.title}
-            className="rounded-lg h-42 pb-4 object-cover"
-          />
-        </div>
+      <div className="relative z-10 shrink-0 self-center md:self-end">
+        <img
+          src={data.overview.thumbnail.url}
+          alt={data.overview.title}
+          className="rounded-lg h-32 md:h-40 w-auto object-cover shadow-md"
+        />
       </div>
     </div>
   );

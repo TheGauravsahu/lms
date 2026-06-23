@@ -26,7 +26,9 @@ const HomePage = () => {
             </h1>
           </div>
 
-          <CommandMenu />
+          <div className="hidden sm:block">
+            <CommandMenu />
+          </div>
         </div>
 
         <nav className="flex items-center gap-4">

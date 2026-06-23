@@ -20,11 +20,11 @@ const FolderDetails = () => {
   if (isPending)
     return (
       <div>
-        <section className="flex gap-8 items-start  py-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-6">
           {[1, 2, 3, 4].map((c) => (
             <div
               key={c}
-              className="bg-gradient-to-l from-gray-200  h-18 border w-[30%] rounded-lg p-2 flex justify-between items-center"
+              className="bg-card dark:bg-muted/40 h-18 border rounded-lg p-3 animate-pulse"
             />
           ))}
         </section>
@@ -37,8 +37,8 @@ const FolderDetails = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-2xl">Folders</h2>
-          <div className="border-b-black border-b-2 pb-1 font-[550] mt-6 w-32">
-            <span className="flex items-center">
+          <div className="border-b-primary border-b-2 pb-1 font-[550] mt-6 w-32">
+            <span className="flex items-center text-foreground">
               Folder
               <div className="flex items-center justify-center ml-1 bg-secondary rounded-full text-xs p-1 h-5 w-5">
                 {data.length}
@@ -60,26 +60,27 @@ const FolderDetails = () => {
         )}
       </div>
 
-      <section className="flex gap-8 items-start  py-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-6">
         {data.map((c) => (
           <div
             key={c._id}
-            className="bg-gradient-to-l from-gray-200  h-18 border w-[30%] rounded-lg p-2 flex justify-between items-center"
+            className="bg-card dark:bg-muted/40 border rounded-lg p-3 flex justify-between items-center shadow-2xs hover:shadow-xs transition-shadow"
           >
-            <div className="flex gap-2 items-center">
-              <div className="w-24 h-14 overflow-hidden rounded-sm">
+            <div className="flex gap-3 items-center min-w-0">
+              <div className="w-16 h-10 overflow-hidden rounded-md shrink-0">
                 <img
                   src={c.thumbnail.url}
                   alt={c.title}
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span className="font-semibold">{c.title}</span>
+              <span className="font-semibold text-sm truncate text-foreground">{c.title}</span>
             </div>
 
             <Button
               variant="ghost"
-              className="cursor-pointer"
+              size="icon"
+              className="cursor-pointer shrink-0 rounded-full h-8 w-8 hover:bg-secondary"
               onClick={() =>
                 isAdmin
                   ? data.parent_id === null
@@ -94,7 +95,7 @@ const FolderDetails = () => {
                       )
               }
             >
-              <ChevronRight />
+              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         ))}

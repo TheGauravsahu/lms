@@ -56,12 +56,12 @@ const CoursesList = () => {
       >
         {data.map((c) => (
           <div
-            className={`rounded-sm bg-linear-to-t from-gray-100 to-orange-600  border h-70 ${isHome ? "w-64 " : "w-60"} overflow-hidden`}
+            className={`rounded-sm bg-linear-to-t from-gray-100 to-orange-600 dark:from-orange-800  border h-70 ${isHome ? "w-64 " : "w-60"} overflow-hidden`}
             key={c._id}
           >
             <div
               onClick={() => navigate("/all-courses/" + c._id)}
-              className="overflow-hidden w-full h-[60%] rounded-t-sm cursor-pointer"
+              className="overflow-hidden w-full h-[50%] rounded-t-sm cursor-pointer"
             >
               <img
                 src={c.thumbnail.url}

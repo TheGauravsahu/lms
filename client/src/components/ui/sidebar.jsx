@@ -245,7 +245,7 @@ function SidebarTrigger({ className, onClick, ...props }) {
       <div>
         <svg
           className="h-6 w-6"
-          fill="#000000"
+          fill="currentColor"
           width="328"
           height="328"
           viewBox="0 0 24 24"

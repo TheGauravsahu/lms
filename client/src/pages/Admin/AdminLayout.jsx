@@ -13,7 +13,9 @@ const AdminLayout = () => {
         <nav className="w-full flex items-center justify-between px-4 sticky top-0 right-0 bg-background z-9">
           <SidebarTrigger />
           <div className="flex items-center gap-4">
-            <AdminCommandMenu />
+            <div className="hidden sm:block">
+              <AdminCommandMenu />
+            </div>
             <ThemeToggle />
             <ProfileDropdown />
           </div>
