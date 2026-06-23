@@ -16,21 +16,21 @@ import { useNavigate } from "react-router";
 import Spinner from "../spinner";
 
 const pages = [
-  {
-    id: "all-courses",
-    title: "All Courses",
-    path: "/all-courses",
-  },
-  {
-    id: "account",
-    title: "My Account",
-    path: "/my-account",
-  },
-  {
-    id: "my-courses",
-    title: "My Courses",
-    path: "/my-courses",
-  },
+  { id: "all-courses", title: "All Courses", path: "/all-courses" },
+  { id: "account", title: "My Account", path: "/my-account" },
+  { id: "my-courses", title: "My Courses", path: "/my-courses" },
+  { id: "dashboard", title: "Student Dashboard", path: "/dashboard" },
+  { id: "quizzes", title: "Quizzes", path: "/quizzes" },
+  { id: "sandbox", title: "Playground Sandbox", path: "/sandbox" },
+  { id: "leaderboard", title: "Leaderboard", path: "/leaderboard" },
+  { id: "forums", title: "Community Forums", path: "/forums" },
+  { id: "study-groups", title: "Study Groups", path: "/study-groups" },
+  { id: "peer-reviews", title: "Peer Reviews", path: "/peer-reviews" },
+  { id: "announcements", title: "Announcements & Updates", path: "/announcements" },
+  { id: "calendar", title: "Planner & Deadlines Calendar", path: "/productivity/calendar" },
+  { id: "resources", title: "Downloadable Handouts & PDF Resources", path: "/productivity/resources" },
+  { id: "watch-later", title: "Watch Later Queue", path: "/productivity/watch-later" },
+  { id: "search", title: "Global Knowledge Search", path: "/search" },
 ];
 
 const CommandMenu = () => {

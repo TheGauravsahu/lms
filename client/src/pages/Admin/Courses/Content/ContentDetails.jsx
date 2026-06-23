@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { courseApi } from "@/api/courseApi";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronRight, X, CheckCircle2, Circle, FileText } from "lucide-react";
+import { productivityApi } from "@/api/productivityApi";
 import {
   useLocation,
   useNavigate,
@@ -26,6 +27,7 @@ const ContentDetails = () => {
   const [searchParams] = useSearchParams();
   const parent = searchParams.get("parent");
   const folder_id = searchParams.get("folder_id");
+  const play = searchParams.get("play");
 
   const [activeVideo, setActiveVideo] = useState(null);
   const [activeQuiz, setActiveQuiz] = useState(null);
@@ -40,8 +42,30 @@ const ContentDetails = () => {
   const courseTitle = courseDetails?.overview?.title || "This Course";
   const toggleProgressMutation = progressApi.useToggleProgress();
 
+  const { data: videoProgress } = productivityApi.useGetVideoProgress();
+
   const { data, isPending, isError } =
     courseApi.useGetAllCourseContents(folder_id);
+
+  // Auto-play video if "play" query param is present
+  useEffect(() => {
+    if (play && data && !activeVideo) {
+      const match = data.find((c) => c._id === play);
+      if (match && match.content_type === "VIDEO") {
+        const savedItem = videoProgress?.find((vp) => vp.contentId?._id === play);
+        const initialTime = savedItem ? savedItem.playbackTime : 0;
+        
+        setActiveQuiz(null);
+        setActiveVideo({
+          url: match.content?.url || match.content,
+          title: match.title,
+          id: match._id,
+          initialTime
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  }, [play, data, activeVideo, videoProgress]);
 
   if (isError) return <ErrorOccured />;
   if (isPending)
@@ -127,7 +151,14 @@ const ContentDetails = () => {
               <X className="w-4 h-4" />
             </Button>
           </div>
-          <CustomVideoPlayer url={activeVideo.url} title={activeVideo.title} />
+          <CustomVideoPlayer
+            url={activeVideo.url}
+            title={activeVideo.title}
+            contentId={activeVideo.id}
+            courseId={course_id}
+            isAdmin={isAdmin}
+            initialTime={activeVideo.initialTime || 0}
+          />
           
           {/* Discussion comments underneath video player */}
           <ContentComments contentId={activeVideo.id} />
@@ -275,11 +306,18 @@ const ContentDetails = () => {
                       variant="ghost"
                       size="icon"
                       className={`cursor-pointer rounded-full h-8 w-8 hover:bg-secondary ${
-                        activeVideo?.url === c.content.url ? "text-orange-500 bg-secondary" : ""
+                        activeVideo?.id === c._id ? "text-orange-500 bg-secondary" : ""
                       }`}
                       onClick={() => {
                         setActiveQuiz(null); // Close quiz if video opened
-                        setActiveVideo({ url: c.content.url, title: c.title, id: c._id });
+                        const savedItem = videoProgress?.find((vp) => vp.contentId?._id === c._id);
+                        const initialTime = savedItem ? savedItem.playbackTime : 0;
+                        setActiveVideo({
+                          url: c.content?.url || c.content,
+                          title: c.title,
+                          id: c._id,
+                          initialTime
+                        });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
@@ -315,7 +353,7 @@ const ContentDetails = () => {
               <div
                 key={c._id}
                 className={`bg-card dark:bg-muted/40 border rounded-lg p-3 shadow-2xs hover:shadow-xs transition-all ${
-                  activeVideo?.url === c.content?.url || activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "border-orange-500 ring-1 ring-orange-500/50" : ""
+                  activeVideo?.id === c._id || activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "border-orange-500 ring-1 ring-orange-500/50" : ""
                 } ${isCompleted && !isAdmin ? "opacity-90 border-green-500/30 bg-green-500/2 dark:bg-green-500/1" : ""}`}
               >
                 {cardContent}

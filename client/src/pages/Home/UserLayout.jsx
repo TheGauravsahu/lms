@@ -1,15 +1,26 @@
+import { useEffect } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Outlet } from "react-router";
 import UserDropdown from "@/components/auth/user-dropdown";
 import CommandMenu from "@/components/home/command-menu";
 import UserSidebar from "@/components/home/user-sidebar";
 import { useAuthStore } from "@/store/auth";
+import { authApi } from "@/api/authApi";
 import LoginModal from "@/components/auth/login-modal";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const UserLayout = () => {
-  const user = useAuthStore((state) => state.user);
+  const { token, user, login } = useAuthStore();
+  
+  // Fetch latest account details (triggers streak calculation) on mount / layout load
+  const { data: latestUser } = authApi.useGetAccountDetails();
+
+  useEffect(() => {
+    if (latestUser && token) {
+      login({ token, user: latestUser });
+    }
+  }, [latestUser, token, login]);
 
   return (
     <SidebarProvider>

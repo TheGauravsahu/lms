@@ -32,6 +32,12 @@ import AdminForums from "@/pages/Admin/Community/AdminForums";
 import AdminStudyGroups from "@/pages/Admin/Community/AdminStudyGroups";
 import AdminPeerReviews from "@/pages/Admin/Community/AdminPeerReviews";
 import AdminLeaderboard from "@/pages/Admin/Community/AdminLeaderboard";
+import Announcements from "@/pages/Home/Announcements";
+import Calendar from "@/pages/Home/Calendar";
+import Resources from "@/pages/Home/Resources";
+import WatchLater from "@/pages/Home/WatchLater";
+import GlobalSearch from "@/pages/Home/GlobalSearch";
+import AdminAnnouncements from "@/pages/Admin/Announcements/AdminAnnouncements";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -103,6 +109,25 @@ export const router = createBrowserRouter([
               { path: ":reviewId", element: <PeerReviewDetail /> },
             ],
           },
+          {
+            path: "announcements",
+            element: <UserLayout />,
+            children: [{ index: true, element: <Announcements /> }],
+          },
+          {
+            path: "productivity",
+            element: <UserLayout />,
+            children: [
+              { path: "calendar", element: <Calendar /> },
+              { path: "resources", element: <Resources /> },
+              { path: "watch-later", element: <WatchLater /> },
+            ],
+          },
+          {
+            path: "search",
+            element: <UserLayout />,
+            children: [{ index: true, element: <GlobalSearch /> }],
+          },
         ],
       },
       
@@ -171,6 +196,10 @@ export const router = createBrowserRouter([
           {
             path: "leaderboard",
             element: <AdminLeaderboard />,
+          },
+          {
+            path: "announcements",
+            element: <AdminAnnouncements />,
           },
           {
             path: "community",

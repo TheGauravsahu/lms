@@ -20,6 +20,7 @@ import {
   UsersRound,
   Code2,
   Trophy,
+  Megaphone,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -28,6 +29,7 @@ const mainItems = [
   { title: "Courses", icon: BookCopy, href: "/admin/courses" },
   { title: "Students", icon: Users, href: "/admin/students" },
   { title: "Quizzes", icon: Brain, href: "/admin/quizzes" },
+  { title: "Announcements", icon: Megaphone, href: "/admin/announcements" },
   { title: "Upload", icon: CloudDownload, href: "/admin/uploads" },
   { title: "Settings", icon: Settings, href: "/admin/setting" },
 ];

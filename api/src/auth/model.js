@@ -35,6 +35,18 @@ const accountSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    currentStreak: {
+      type: Number,
+      default: 0,
+    },
+    longestStreak: {
+      type: Number,
+      default: 0,
+    },
+    lastActiveDate: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );

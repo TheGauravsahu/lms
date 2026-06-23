@@ -16,21 +16,18 @@ import { useNavigate } from "react-router";
 import Spinner from "../spinner";
 
 const pages = [
-  {
-    id: "dashboard",
-    title: "Dashboard",
-    path: "/admin",
-  },
-  {
-    id: "all-courses",
-    title: "All Courses",
-    path: "/admin/courses",
-  },
-  {
-    id: "new-course",
-    title: "New Course",
-    path: "/admin/courses/create-course",
-  },
+  { id: "dashboard", title: "Dashboard", path: "/admin" },
+  { id: "all-courses", title: "All Courses", path: "/admin/courses" },
+  { id: "new-course", title: "New Course", path: "/admin/courses/create-course" },
+  { id: "students", title: "Students Management", path: "/admin/students" },
+  { id: "quizzes", title: "Quizzes", path: "/admin/quizzes" },
+  { id: "announcements", title: "Announcements Panel", path: "/admin/announcements" },
+  { id: "forums", title: "Admin Forums", path: "/admin/community/forums" },
+  { id: "study-groups", title: "Admin Study Groups", path: "/admin/community/study-groups" },
+  { id: "peer-reviews", title: "Admin Peer Reviews", path: "/admin/community/peer-reviews" },
+  { id: "leaderboard", title: "Admin Leaderboard", path: "/admin/leaderboard" },
+  { id: "uploads", title: "Upload Manager", path: "/admin/uploads" },
+  { id: "setting", title: "Admin Profile Settings", path: "/admin/setting" },
 ];
 
 const AdminCommandMenu = () => {

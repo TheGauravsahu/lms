@@ -30,6 +30,28 @@ Gaurav LMS is a premium, developer-first interactive learning platform designed 
 ### 5. Radix UI Dialog deletes
 * Replaced native browser `confirm()` alerts in the Admin Quiz panel with an animated custom confirmation Dialog box.
 
+### 6. Daily Streaks & Milestones
+* **Consistency Tracker**: Automatically tracks user login activity timezone-safely on the backend whenever profile details are loaded.
+* **Badges & XP Reward**: Awards milestone achievement badges ("Habit Builder" at 3 days, "Dedicated Learner" at 7 days, "Unstoppable" at 30 days) and bonus Experience Points (XP) directly to the student profile.
+* **Streak Calendar**: A visual 7-day calendar strip rendering fire flames on active learning days on the student dashboard.
+
+### 7. Announcement System
+* **Global & Course Updates**: Instructors/Admins can publish announcements globally or target specific courses.
+* **Targeted Visibility**: Students only view announcements that are global or match courses they have bought, cached via Redis for fast loading.
+
+### 8. Productivity Center
+* **Planner & Deadlines Calendar**: Allows scheduling of personal reminders, study events, and course assignment deadlines with calendar checkbox completions.
+* **Watch Queue (Watch Later)**: Save video lessons from course chapters to review later in a centralized watchlist.
+* **Continue Watching Carousel**: Tracks video playback completion percentages. Displays active lectures as interactive cards on the dashboard, allowing one-click resume from the exact second playback stopped.
+* **Download Handouts Repository**: Centrally aggregates all downloadable PDF handouts and lecture sheets from purchased courses for one-click downloading.
+
+### 9. Unified Global Search
+* **Search Knowledge**: Instantly queries matches across all published course lessons, quizzes, and community forum threads, returning grouped tabbed results for quick reading.
+
+### 10. Performance Optimization (Redis & Pagination)
+* **API Caching**: Integrated Redis caching for high-traffic routes (Forums, Study Groups, and Peer Reviews) to maximize performance.
+* **Admin Dashboard Pagination**: Implemented Server-side pagination for Students list, Courses list, and the `/all-courses` browse page.
+
 ---
 
 ## 🛠️ Technology Stack

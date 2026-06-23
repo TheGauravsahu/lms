@@ -8,8 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { productivityApi } from "@/api/productivityApi";
+import { apiClient } from "@/lib/axios";
 
-const CustomVideoPlayer = ({ url, title }) => {
+const CustomVideoPlayer = ({ url, title, contentId, courseId, isAdmin, initialTime = 0 }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const haptic = useHaptic();
@@ -22,6 +24,45 @@ const CustomVideoPlayer = ({ url, title }) => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const updateProgressMutation = productivityApi.useUpdateVideoProgress();
+  const lastSavedTimeRef = useRef(0);
+
+  // Reset last saved time on video change
+  useEffect(() => {
+    lastSavedTimeRef.current = 0;
+  }, [url, contentId]);
+
+  // Save progress function
+  const saveProgress = (time, dur) => {
+    if (!isAdmin && courseId && contentId && dur > 0) {
+      lastSavedTimeRef.current = time;
+      updateProgressMutation.mutate({
+        contentId,
+        courseId,
+        playbackTime: Math.floor(time),
+        duration: Math.floor(dur),
+      });
+    }
+  };
+
+  // Save progress on component unmount
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && !isAdmin && courseId && contentId) {
+        const time = videoRef.current.currentTime;
+        const dur = videoRef.current.duration || duration;
+        if (dur > 0) {
+          apiClient.post("/productivity/video-progress", {
+            contentId,
+            courseId,
+            playbackTime: Math.floor(time),
+            duration: Math.floor(dur),
+          }).catch((err) => console.error("Failed to save progress on unmount", err));
+        }
+      }
+    };
+  }, [contentId, courseId, isAdmin, duration]);
 
   // Time formatting helper
   const formatTime = (timeInSeconds) => {
@@ -36,6 +77,7 @@ const CustomVideoPlayer = ({ url, title }) => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        saveProgress(videoRef.current.currentTime, duration);
       } else {
         videoRef.current.play();
       }
@@ -145,13 +187,29 @@ const CustomVideoPlayer = ({ url, title }) => {
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+      const curTime = videoRef.current.currentTime;
+      setCurrentTime(curTime);
+
+      // Periodically save progress (every 5 seconds of playback)
+      if (!isAdmin && courseId && contentId && duration > 0) {
+        if (Math.abs(curTime - lastSavedTimeRef.current) >= 5) {
+          saveProgress(curTime, duration);
+        }
+      }
     }
   };
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      setDuration(videoRef.current.duration);
+      const dur = videoRef.current.duration;
+      setDuration(dur);
+      
+      // Set initial playback position
+      if (initialTime && initialTime < dur) {
+        videoRef.current.currentTime = initialTime;
+        setCurrentTime(initialTime);
+        lastSavedTimeRef.current = initialTime;
+      }
     }
   };
 

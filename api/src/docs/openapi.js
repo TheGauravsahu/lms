@@ -25,6 +25,9 @@ export const openApiSpec = {
     { name: "Admin", description: "Admin — Dashboard & analytics" },
     { name: "Uploads", description: "File upload management" },
     { name: "Health", description: "Server health check" },
+    { name: "Announcements", description: "Course and global announcements" },
+    { name: "Productivity", description: "Calendar, Watch Later, Playback Tracking, Resources" },
+    { name: "Search", description: "Global unified search" },
   ],
   components: {
     securitySchemes: {
@@ -582,6 +585,196 @@ export const openApiSpec = {
         summary: "Get 5 most recent uploads (Admin)",
         security: [{ bearerAuth: [] }],
         responses: { 200: { description: "Recent uploads list" } },
+      },
+    },
+
+    // ─── Announcements ──────────────────────────────────────────────
+    "/announcements": {
+      get: {
+        tags: ["Announcements"],
+        summary: "Fetch announcements for authenticated user/admin",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Announcements list" } },
+      },
+      post: {
+        tags: ["Announcements"],
+        summary: "Create a course-specific or global announcement (Admin)",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["title", "body"],
+                properties: {
+                  title: { type: "string" },
+                  body: { type: "string" },
+                  courseId: { type: "string", description: "Target course ID, omit for global" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 201: { description: "Announcement created" } },
+      },
+    },
+    "/announcements/{id}": {
+      delete: {
+        tags: ["Announcements"],
+        summary: "Delete an announcement (Admin)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Announcement deleted" } },
+      },
+    },
+
+    // ─── Productivity ───────────────────────────────────────────────
+    "/productivity/calendar": {
+      get: {
+        tags: ["Productivity"],
+        summary: "Get user calendar tasks, deadlines and reminders",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "List of calendar tasks" } },
+      },
+      post: {
+        tags: ["Productivity"],
+        summary: "Create a calendar task / reminder / deadline",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["title", "dueDate"],
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  type: { type: "string", enum: ["deadline", "reminder", "event"] },
+                  dueDate: { type: "string", format: "date-time" },
+                  courseId: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 201: { description: "Event created" } },
+      },
+    },
+    "/productivity/calendar/{id}": {
+      put: {
+        tags: ["Productivity"],
+        summary: "Update or complete a calendar task / reminder",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object" } } },
+        },
+        responses: { 200: { description: "Event updated" } },
+      },
+      delete: {
+        tags: ["Productivity"],
+        summary: "Delete a calendar task",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Event deleted" } },
+      },
+    },
+    "/productivity/watch-later": {
+      get: {
+        tags: ["Productivity"],
+        summary: "Get watch later items list",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Watch later list" } },
+      },
+      post: {
+        tags: ["Productivity"],
+        summary: "Add content to watch later",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["contentId"],
+                properties: { contentId: { type: "string" } },
+              },
+            },
+          },
+        },
+        responses: { 201: { description: "Added to watch later" } },
+      },
+    },
+    "/productivity/watch-later/{contentId}": {
+      delete: {
+        tags: ["Productivity"],
+        summary: "Remove from watch later",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "contentId", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Removed from watch later" } },
+      },
+    },
+    "/productivity/video-progress": {
+      get: {
+        tags: ["Productivity"],
+        summary: "Fetch active playback progress (Continue Watching)",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Continue watching progresses" } },
+      },
+      post: {
+        tags: ["Productivity"],
+        summary: "Update video playback progress state",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["contentId", "courseId", "playbackTime", "duration"],
+                properties: {
+                  contentId: { type: "string" },
+                  courseId: { type: "string" },
+                  playbackTime: { type: "number" },
+                  duration: { type: "number" },
+                },
+              },
+            },
+          },
+        },
+        responses: { 200: { description: "Playback position saved" } },
+      },
+    },
+    "/productivity/resources": {
+      get: {
+        tags: ["Productivity"],
+        summary: "centralized downloadable PDF resources lists for enrolled courses",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Resources lists" } },
+      },
+    },
+
+    // ─── Search ─────────────────────────────────────────────────────
+    "/search/global": {
+      get: {
+        tags: ["Search"],
+        summary: "Global unified query search across courses contents, quizzes and forums",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "q", in: "query", required: true, schema: { type: "string" } },
+        ],
+        responses: { 200: { description: "Unified search results" } },
       },
     },
   },
