@@ -6,6 +6,7 @@ import UserSidebar from "@/components/home/user-sidebar";
 import { useAuthStore } from "@/store/auth";
 import LoginModal from "@/components/auth/login-modal";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const UserLayout = () => {
   const user = useAuthStore((state) => state.user);
@@ -18,6 +19,7 @@ const UserLayout = () => {
           <SidebarTrigger />
           <div className="flex items-center gap-4">
             <CommandMenu />
+            <ThemeToggle />
 
             {user ? (
               <UserDropdown user={user} />
@@ -30,7 +32,7 @@ const UserLayout = () => {
             )}
           </div>
         </nav>
-        <div className="p-8 pr-2">
+        <div className="p-4 md:p-8 pr-2">
           <Outlet />
         </div>
       </main>

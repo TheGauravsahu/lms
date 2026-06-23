@@ -8,8 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Folder, LayoutDashboard } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useAuthStore } from "@/store/auth";
 
 const items = [
   {
@@ -36,6 +37,16 @@ const items = [
 
 const UserSidebar = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+
+  const menuItems = [...items];
+  if (user && user.role === "ADMIN") {
+    menuItems.push({
+      title: "Admin Panel",
+      icon: ShieldCheck,
+      href: "/admin",
+    });
+  }
 
   return (
     <Sidebar>
@@ -53,7 +64,7 @@ const UserSidebar = () => {
       <SidebarContent className="px-2 pt-1">
         <SidebarGroup>
           <SidebarMenu>
-            {items.map((item) => (
+            {menuItems.map((item) => (
               <SidebarMenuItem
                 key={item.title}
                 onClick={() => navigate(item.href)}

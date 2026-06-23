@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useAuthStore } from "@/store/auth";
-import { LogOut, User2, FolderOpen, LayoutDashboard, Settings } from "lucide-react";
+import { LogOut, User2, FolderOpen, LayoutDashboard, Settings, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router";
 
 const UserDropdown = ({ user }) => {
@@ -24,6 +24,15 @@ const UserDropdown = ({ user }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-6 mt-2">
         <DropdownMenuGroup>
+          {user.role === "ADMIN" && (
+            <DropdownMenuLabel
+              onClick={() => navigate("/admin")}
+              className="flex items-center gap-2 cursor-pointer text-orange-500 hover:bg-secondary hover:rounded-sm transition-all font-semibold text-sm"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Admin Panel
+            </DropdownMenuLabel>
+          )}
           <DropdownMenuLabel
             onClick={() => navigate("/dashboard")}
             className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all font-medium text-sm"

@@ -21,23 +21,32 @@ const app = express();
 
 app.use(cors({ origin: env.LMS_CLIENT_URL, credentials: true }));
 
-// Relax CSP for Scalar docs route only
-app.use("/docs", (req, res, next) =>
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://scalar.com"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "http://localhost:*"],
-        workerSrc: ["'self'", "blob:"],
+// Helmet: relaxed CSP for Scalar /docs UI, strict for all other routes.
+// Using a single middleware to prevent the strict helmet from overwriting the relaxed one.
+app.use((req, res, next) => {
+  if (req.path.startsWith("/docs")) {
+    return helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            "https://cdn.jsdelivr.net",
+          ],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+          imgSrc: ["'self'", "data:", "https:", "blob:"],
+          connectSrc: ["'self'", "http://localhost:*", "https:"],
+          workerSrc: ["'self'", "blob:"],
+          frameSrc: ["'self'"],
+        },
       },
-    },
-  })(req, res, next)
-);
-app.use(helmet()); // strict helmet for all other routes
+    })(req, res, next);
+  }
+  return helmet()(req, res, next);
+});
 app.use(express.json({ limit: "10kb" })); // Limit JSON payload size to prevent DoS
 
 // Workaround: Express 5 makes req.query a read-only getter.

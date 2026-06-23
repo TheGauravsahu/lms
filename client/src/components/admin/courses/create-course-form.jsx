@@ -39,9 +39,9 @@ const CreateCourseForm = () => {
 
   return (
     <form className="mt-10" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="flex gap-1  justify-between w-full h-full">
+      <div className="flex flex-col md:flex-row gap-6 justify-between w-full h-full">
         {/* field area */}
-        <div className="w-md h-full  space-y-6">
+        <div className="w-full md:max-w-md h-full space-y-6 order-2 md:order-1">
           <div>
             <Label>Title</Label>
             <Input
@@ -128,7 +128,7 @@ const CreateCourseForm = () => {
         </div>
 
         {/* upload area */}
-        <div className="w-[45%] h-full mt-4">
+        <div className="w-full md:w-[45%] h-full mt-4 order-1 md:order-2">
           <UploadThumbnail
             value={form.watch("thumbnail")}
             onChange={(url) =>
