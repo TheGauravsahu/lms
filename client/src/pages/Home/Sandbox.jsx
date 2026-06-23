@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
-import { Code2, Play, Terminal, Eye, RefreshCw, AlertCircle, Sparkles, Award } from "lucide-react";
+import { Code2, Play, Terminal, Eye, RefreshCw} from "lucide-react";
 import { studentApi } from "@/api/studentApi";
 
 const DEFAULT_JS = `// JavaScript Console Playground
