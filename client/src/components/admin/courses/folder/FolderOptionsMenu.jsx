@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,7 +66,7 @@ const FolderOptionsMenu = ({ courseId, folder }) => {
         open={openDelete}
         onOpenChange={setOpenDelete}
         courseId={courseId}
-        folderId={folder._id}
+        folderId={folder.parent_id}
         folderTitle={folder.title}
       />
     </>

@@ -22,6 +22,16 @@ import AdminQuizzes from "@/pages/Admin/Quizzes/AdminQuizzes";
 import Quizzes from "@/pages/Home/Quizzes";
 import Sandbox from "@/pages/Home/Sandbox";
 import Leaderboard from "@/pages/Home/Leaderboard";
+import Forums from "@/pages/Home/Forums";
+import ForumPost from "@/pages/Home/ForumPost";
+import StudyGroups from "@/pages/Home/StudyGroups";
+import StudyGroupDetail from "@/pages/Home/StudyGroupDetail";
+import PeerReviews from "@/pages/Home/PeerReviews";
+import PeerReviewDetail from "@/pages/Home/PeerReviewDetail";
+import AdminForums from "@/pages/Admin/Community/AdminForums";
+import AdminStudyGroups from "@/pages/Admin/Community/AdminStudyGroups";
+import AdminPeerReviews from "@/pages/Admin/Community/AdminPeerReviews";
+import AdminLeaderboard from "@/pages/Admin/Community/AdminLeaderboard";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -68,6 +78,30 @@ export const router = createBrowserRouter([
             path: "leaderboard",
             element: <UserLayout />,
             children: [{ index: true, element: <Leaderboard /> }],
+          },
+          {
+            path: "forums",
+            element: <UserLayout />,
+            children: [
+              { index: true, element: <Forums /> },
+              { path: ":postId", element: <ForumPost /> },
+            ],
+          },
+          {
+            path: "study-groups",
+            element: <UserLayout />,
+            children: [
+              { index: true, element: <StudyGroups /> },
+              { path: ":groupId", element: <StudyGroupDetail /> },
+            ],
+          },
+          {
+            path: "peer-reviews",
+            element: <UserLayout />,
+            children: [
+              { index: true, element: <PeerReviews /> },
+              { path: ":reviewId", element: <PeerReviewDetail /> },
+            ],
           },
         ],
       },
@@ -133,6 +167,18 @@ export const router = createBrowserRouter([
           {
             path: "quizzes",
             element: <AdminQuizzes />,
+          },
+          {
+            path: "leaderboard",
+            element: <AdminLeaderboard />,
+          },
+          {
+            path: "community",
+            children: [
+              { path: "forums", element: <AdminForums /> },
+              { path: "study-groups", element: <AdminStudyGroups /> },
+              { path: "peer-reviews", element: <AdminPeerReviews /> },
+            ],
           },
           {
             path: "courses",

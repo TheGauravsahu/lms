@@ -75,7 +75,7 @@ const NewFolder = () => {
               />
             </div>
 
-            <LoadingButton isPending={isPending}>
+            <LoadingButton isPending={isPending} type='submit'>
               <Plus /> Create Folder
             </LoadingButton>
           </form>

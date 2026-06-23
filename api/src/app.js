@@ -18,6 +18,9 @@ import progressRoutes from "./progress/route.js";
 import commentRoutes from "./comments/route.js";
 import reviewRoutes from "./reviews/route.js";
 import quizRoutes from "./quiz/route.js";
+import forumRoutes from "./forums/route.js";
+import studyGroupRoutes from "./studygroups/route.js";
+import peerReviewRoutes from "./peerreviews/route.js";
 import { apiReference } from "@scalar/express-api-reference";
 import { openApiSpec } from "./docs/openapi.js";
 import mongoose from "mongoose";
@@ -87,6 +90,9 @@ app.use("/api/progress", progressRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/quizzes", quizRoutes);
+app.use("/api/forums", forumRoutes);
+app.use("/api/study-groups", studyGroupRoutes);
+app.use("/api/peer-reviews", peerReviewRoutes);
 
 // ─── API Documentation (Scalar) ───────────────────────────────────────────────
 app.get("/docs/spec.json", (req, res) => res.json(openApiSpec));

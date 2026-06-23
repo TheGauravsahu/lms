@@ -7,8 +7,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2 } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2, MessageSquare, UsersRound, GitPullRequest } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/auth";
 
@@ -43,11 +44,12 @@ const items = [
     icon: Trophy,
     href: "/leaderboard",
   },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/setting",
-  },
+];
+
+const communityItems = [
+  { title: "Forums", icon: MessageSquare, href: "/forums" },
+  { title: "Study Groups", icon: UsersRound, href: "/study-groups" },
+  { title: "Peer Reviews", icon: GitPullRequest, href: "/peer-reviews" },
 ];
 
 const UserSidebar = () => {
@@ -80,6 +82,22 @@ const UserSidebar = () => {
         <SidebarGroup>
           <SidebarMenu>
             {menuItems.map((item) => (
+              <SidebarMenuItem
+                key={item.title}
+                onClick={() => navigate(item.href)}
+              >
+                <SidebarMenuButton className="cursor-pointer gap-4 text-muted-foreground">
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Community</SidebarGroupLabel>
+          <SidebarMenu>
+            {communityItems.map((item) => (
               <SidebarMenuItem
                 key={item.title}
                 onClick={() => navigate(item.href)}

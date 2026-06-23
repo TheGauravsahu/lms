@@ -3,6 +3,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -15,44 +16,44 @@ import {
   LayoutPanelLeft,
   Settings,
   Brain,
+  MessageSquare,
+  UsersRound,
+  Code2,
+  Trophy,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
-const items = [
-  {
-    title: "Dashboard",
-    icon: LayoutPanelLeft,
-    href: "/admin",
-  },
-  {
-    title: "Courses",
-    icon: BookCopy,
-    href: "/admin/courses",
-  },
-  {
-    title: "Students",
-    icon: Users,
-    href: "/admin/students",
-  },
-  {
-    title: "Quizzes",
-    icon: Brain,
-    href: "/admin/quizzes",
-  },
-  {
-    title: "Upload",
-    icon: CloudDownload,
-    href: "/admin/uploads",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/admin/setting",
-  },
+const mainItems = [
+  { title: "Dashboard", icon: LayoutPanelLeft, href: "/admin" },
+  { title: "Courses", icon: BookCopy, href: "/admin/courses" },
+  { title: "Students", icon: Users, href: "/admin/students" },
+  { title: "Quizzes", icon: Brain, href: "/admin/quizzes" },
+  { title: "Upload", icon: CloudDownload, href: "/admin/uploads" },
+  { title: "Settings", icon: Settings, href: "/admin/setting" },
+];
+
+const communityItems = [
+  { title: "Forums", icon: MessageSquare, href: "/admin/community/forums" },
+  { title: "Study Groups", icon: UsersRound, href: "/admin/community/study-groups" },
+  { title: "Peer Reviews", icon: Code2, href: "/admin/community/peer-reviews" },
+];
+
+const gamificationItems = [
+  { title: "Leaderboard", icon: Trophy, href: "/admin/leaderboard" },
 ];
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
+
+  const renderItems = (items) =>
+    items.map((item) => (
+      <SidebarMenuItem key={item.title} onClick={() => navigate(item.href)}>
+        <SidebarMenuButton className="cursor-pointer gap-4 text-muted-foreground">
+          {item.icon && <item.icon />}
+          <span>{item.title}</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    ));
 
   return (
     <Sidebar>
@@ -61,7 +62,7 @@ const AdminSidebar = () => {
           <div className="w-8 overflow-hidden">
             <img src="/icon.png" alt="lms_icon" className="w-full h-full" />
           </div>
-          <h1 className="tracking-tight font-semibold t">
+          <h1 className="tracking-tight font-semibold">
             Gaurav <span className="text-muted-foreground">LMS</span>
           </h1>
         </div>
@@ -69,19 +70,21 @@ const AdminSidebar = () => {
 
       <SidebarContent className="px-2 pt-1">
         <SidebarGroup>
-          <SidebarMenu>
-            {items.map((item) => (
-              <SidebarMenuItem
-                key={item.title}
-                onClick={() => navigate(item.href)}
-              >
-                <SidebarMenuButton className="cursor-pointer gap-4 text-muted-foreground">
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          <SidebarMenu>{renderItems(mainItems)}</SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2 pb-1">
+            Community
+          </SidebarGroupLabel>
+          <SidebarMenu>{renderItems(communityItems)}</SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2 pb-1">
+            Gamification
+          </SidebarGroupLabel>
+          <SidebarMenu>{renderItems(gamificationItems)}</SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />

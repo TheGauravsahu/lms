@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +26,7 @@ const DeleteFolderDialog = ({ open, onOpenChange, courseId, folderId, folderTitl
       haptic.success();
       onOpenChange(false);
     } catch (err) {
+      console.log(err)
       haptic.error();
     }
   };
