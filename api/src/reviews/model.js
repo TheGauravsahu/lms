@@ -4,12 +4,12 @@ const reviewSchema = new mongoose.Schema(
   {
     course_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Course",
+      ref: "courses",
       required: true,
     },
     account_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: "user_accounts",
       required: true,
     },
     rating: {

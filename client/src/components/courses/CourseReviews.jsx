@@ -74,7 +74,7 @@ export const CourseReviews = ({ courseId }) => {
   const hasReviewed = reviews.some((r) => r.account_id?._id === user?._id);
 
   // Can the user submit a review? (Must be logged in, not admin, has purchased, and not already reviewed OR in edit mode)
-  const canReview = user && !isAdmin && isPurchased && (!hasReviewed || isEditing);
+  const canReview = user && isAdmin && isPurchased && (!hasReviewed || isEditing);
 
   return (
     <div className="space-y-8 mt-12 border-t border-border/50 pt-8">
