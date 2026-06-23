@@ -18,6 +18,21 @@ const app = express();
 app.use(cors({ origin: env.LMS_CLIENT_URL, credentials: true }));
 app.use(helmet());
 app.use(express.json({ limit: "10kb" })); // Limit JSON payload size to prevent DoS
+
+// Workaround: Express 5 makes req.query a read-only getter.
+// This redefines req.query as a mutable object copy so express-mongo-sanitize can sanitize it without throwing.
+app.use((req, res, next) => {
+  if (req.query) {
+    Object.defineProperty(req, "query", {
+      value: { ...req.query },
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+  }
+  next();
+});
+
 app.use(mongoSanitize()); // Prevent NoSQL Injection
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(morgan("dev"));
