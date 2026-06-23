@@ -65,7 +65,7 @@ const CourseBanner = ({ data }) => {
         </div>
       </div>
 
-      <div className="relative z-10 shrink-0 self-center md:self-end">
+      <div className="relative z-2 shrink-0 self-center md:self-end">
         <img
           src={data.overview.thumbnail.url}
           alt={data.overview.title}

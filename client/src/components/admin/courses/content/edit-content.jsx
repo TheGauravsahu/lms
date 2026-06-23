@@ -123,6 +123,7 @@ const EditContent = ({ open, onOpenChange, prevContent }) => {
                   <SelectGroup>
                     <SelectItem value="PDF">PDF</SelectItem>
                     <SelectItem value="VIDEO">VIDEO</SelectItem>
+                    <SelectItem value="QUIZ">QUIZ</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

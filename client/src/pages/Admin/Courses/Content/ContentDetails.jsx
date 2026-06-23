@@ -16,6 +16,7 @@ import { progressApi } from "@/api/progressApi";
 import ContentComments from "@/components/courses/ContentComments";
 import EmptyState from "@/components/empty-state";
 import CertificateModal from "@/components/courses/CertificateModal";
+import QuizPlayer from "@/components/courses/QuizPlayer";
 
 const ContentDetails = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const ContentDetails = () => {
   const folder_id = searchParams.get("folder_id");
 
   const [activeVideo, setActiveVideo] = useState(null);
+  const [activeQuiz, setActiveQuiz] = useState(null);
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
 
   const { course_id } = useParams();
@@ -119,6 +121,37 @@ const ContentDetails = () => {
         </div>
       )}
 
+      {/* Active Quiz Section */}
+      {activeQuiz && (
+        <div className="bg-card border rounded-xl p-4 shadow-md space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h2 className="font-bold text-base md:text-lg text-foreground truncate max-w-[80%]">
+              Assessment: {activeQuiz.title}
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setActiveQuiz(null)}
+              className="text-muted-foreground hover:text-foreground cursor-pointer rounded-full h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <QuizPlayer
+            url={activeQuiz.url}
+            title={activeQuiz.title}
+            onComplete={() => {
+              if (!completedSet.has(activeQuiz.id)) {
+                handleToggleComplete(activeQuiz.id);
+              }
+            }}
+          />
+          
+          {/* Discussion comments underneath quiz */}
+          <ContentComments contentId={activeQuiz.id} />
+        </div>
+      )}
+
       {/* header */}
       <div className="flex items-center justify-between">
         <div>
@@ -172,6 +205,7 @@ const ContentDetails = () => {
           {data.map((c) => {
             const isVideo = c.content_type === "VIDEO";
             const isPdf = c.content_type === "PDF";
+            const isQuiz = c.content_type === "QUIZ";
             const isCompleted = completedSet.has(c._id);
 
             const cardContent = (
@@ -231,7 +265,23 @@ const ContentDetails = () => {
                         activeVideo?.url === c.content.url ? "text-orange-500 bg-secondary" : ""
                       }`}
                       onClick={() => {
+                        setActiveQuiz(null); // Close quiz if video opened
                         setActiveVideo({ url: c.content.url, title: c.title, id: c._id });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    >
+                      <ChevronRight className="w-4 h-4 text-orange-500" />
+                    </Button>
+                  ) : isQuiz ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`cursor-pointer rounded-full h-8 w-8 hover:bg-secondary ${
+                        activeQuiz?.url === c.content.url ? "text-orange-500 bg-secondary" : ""
+                      }`}
+                      onClick={() => {
+                        setActiveVideo(null); // Close video if quiz opened
+                        setActiveQuiz({ url: c.content.url, title: c.title, id: c._id });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
@@ -252,7 +302,7 @@ const ContentDetails = () => {
               <div
                 key={c._id}
                 className={`bg-card dark:bg-muted/40 border rounded-lg p-3 shadow-2xs hover:shadow-xs transition-all ${
-                  activeVideo?.url === c.content.url ? "border-orange-500 ring-1 ring-orange-500/50" : ""
+                  activeVideo?.url === c.content.url || activeQuiz?.url === c.content.url ? "border-orange-500 ring-1 ring-orange-500/50" : ""
                 } ${isCompleted && !isAdmin ? "opacity-90 border-green-500/30 bg-green-500/2 dark:bg-green-500/1" : ""}`}
               >
                 {cardContent}
