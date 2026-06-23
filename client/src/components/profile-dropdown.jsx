@@ -7,16 +7,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown } from "lucide-react";
-// import { useNavigate } from "react-router";
+import { ChevronDown, LogOut, LayoutDashboard, Folder, Settings } from "lucide-react";
+import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/auth";
-import { LogOut } from "lucide-react";
-import { LayoutDashboard } from "lucide-react";
-import { Folder } from "lucide-react";
 
 const ProfileDropdown = () => {
-  // const navigate = useNavigate();
-   const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const logout = useAuthStore.getState().logout;
 
   return (
@@ -32,19 +29,35 @@ const ProfileDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-2 mt-2">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex items-center gap-2  cursor-pointer  transition-all">
+          <DropdownMenuLabel
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all font-medium text-sm"
+          >
             <LayoutDashboard className="w-4" />
             Dashboard
           </DropdownMenuLabel>
-          <DropdownMenuLabel className="flex items-center gap-2  cursor-pointer  transition-all">
+          <DropdownMenuLabel
+            onClick={() => navigate("/admin/courses")}
+            className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all font-medium text-sm"
+          >
             <Folder className="w-4" />
             Courses
+          </DropdownMenuLabel>
+          <DropdownMenuLabel
+            onClick={() => navigate("/admin/setting")}
+            className="flex items-center gap-2 cursor-pointer hover:bg-secondary hover:rounded-sm transition-all font-medium text-sm"
+          >
+            <Settings className="w-4" />
+            Settings
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuLabel
-          onClick={() => logout()}
-          className="flex items-center gap-2 text-destructive cursor-pointer  hover:bg-red-100 hover:rounded-sm transition-all"
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
+          className="flex items-center gap-2 text-destructive cursor-pointer hover:bg-red-100 hover:rounded-sm transition-all font-medium text-sm"
         >
           <LogOut className="w-4" />
           Logout

@@ -20,7 +20,7 @@ const items = [
   {
     title: "My Courses",
     icon: Folder,
-    href: "/all-courses",
+    href: "/my-courses",
   },
   {
     title: "Settings",

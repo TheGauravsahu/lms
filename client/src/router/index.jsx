@@ -13,6 +13,9 @@ import HomePage from "@/pages/Home/HomePage";
 import UserLayout from "@/pages/Home/UserLayout";
 import CoursesList from "@/components/home/courses-list";
 import MyCourse from "@/pages/MyCourse/MyCourse";
+import { AuthGuard, AdminGuard } from "@/components/auth/AuthGuard";
+import ProfileSettings from "@/pages/Home/ProfileSettings";
+import AdminUploadPage from "@/pages/Admin/AdminUploadPage";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -20,11 +23,24 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       { index: true, element: <HomePage /> },
+      
+      // Protected user routes
       {
-        path: "all-courses",
-        element: <UserLayout />,
-        children: [{ index: true, element: <MyCourse /> }],
+        element: <AuthGuard />,
+        children: [
+          {
+            path: "my-courses",
+            element: <UserLayout />,
+            children: [{ index: true, element: <MyCourse /> }],
+          },
+          {
+            path: "my-account",
+            element: <UserLayout />,
+            children: [{ index: true, element: <ProfileSettings /> }],
+          },
+        ],
       },
+      
       {
         path: "all-courses",
         element: <UserLayout />,
@@ -65,50 +81,63 @@ export const router = createBrowserRouter([
   // admin_ui
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <AdminGuard />,
     children: [
-      { index: true, element: <AdminDashboard /> },
       {
-        path: "courses",
+        element: <AdminLayout />,
         children: [
+          { index: true, element: <AdminDashboard /> },
           {
-            index: true,
-            element: <MyCourses />,
+            path: "setting",
+            element: <ProfileSettings />,
           },
           {
-            path: "create-course",
-            element: <CreateCourse />,
+            path: "uploads",
+            element: <AdminUploadPage />,
           },
           {
-            path: ":course_id",
-            element: <CourseDetailsLayout />,
+            path: "courses",
             children: [
               {
                 index: true,
-                element: <CourseDetails />,
+                element: <MyCourses />,
               },
               {
-                path: "folders",
+                path: "create-course",
+                element: <CreateCourse />,
+              },
+              {
+                path: ":course_id",
+                element: <CourseDetailsLayout />,
                 children: [
                   {
                     index: true,
                     element: <CourseDetails />,
                   },
                   {
-                    path: ":folder_id",
-                    element: <FolderDetails />,
+                    path: "folders",
+                    children: [
+                      {
+                        index: true,
+                        element: <CourseDetails />,
+                      },
+                      {
+                        path: ":folder_id",
+                        element: <FolderDetails />,
+                      },
+                      {
+                        path: "new-folder",
+                        element: <NewFolder />,
+                      },
+                    ],
                   },
                   {
-                    path: "new-folder",
-                    element: <NewFolder />,
+                    path: "contents",
+                    children: [
+                      { index: true, element: <ContentDetails /> },
+                      { path: "new-content", element: <NewContent /> },
+                    ],
                   },
-                ],
-              },
-              {
-                path: "contents",
-                children: [
-                  { index: true, element: <ContentDetails /> },
-                  { path: "new-content", element: <NewContent /> },
                 ],
               },
             ],

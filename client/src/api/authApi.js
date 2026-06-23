@@ -34,4 +34,24 @@ export const authApi = {
       },
     });
   },
+
+  useEditAccount: () => {
+    const login = useAuthStore.getState().login;
+
+    return useMutation({
+      mutationKey: ["edit-account"],
+      onSuccess: (res) => {
+        toast.success(res.message || "Profile updated successfully.");
+        const token = useAuthStore.getState().token;
+        login({
+          token,
+          user: res.data,
+        });
+      },
+      mutationFn: async (values) => {
+        const { data } = await apiClient.post("/auth/edit-account", values);
+        return data;
+      },
+    });
+  },
 };

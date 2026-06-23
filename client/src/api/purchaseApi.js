@@ -34,7 +34,7 @@ export const purchaseApi = {
     return useQuery({
       queryKey: ["my-purchased-courses"],
       queryFn: async () => {
-        const { data } = await apiClient.post("/purchases/my-purchased-courses");
+        const { data } = await apiClient.get("/purchases/my-purchased-courses");
         return data.data;
       },
     });

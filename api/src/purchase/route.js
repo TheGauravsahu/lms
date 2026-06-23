@@ -19,7 +19,6 @@ r.get(
 );
 r.get(
   "/my-purchased-courses",
-  validate(purchaseCourseSchema),
   purchaseController.getCurrenUserPurchasedCourses,
 );
 r.post(
