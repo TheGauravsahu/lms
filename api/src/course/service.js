@@ -185,6 +185,22 @@ class CourseService {
     await deleteCache(cacheKey);
     return true;
   };
+
+  deleteCourse = async (course_id) => {
+    const course = await courseModel.findById(course_id);
+    if (!course) return false;
+    // cascade delete folders and contents
+    const folders = await courseFolderModel.find({ course_id });
+    for (const folder of folders) {
+      await courseContentModel.deleteMany({ folder_id: folder._id });
+      await deleteCache(`course_contents:${folder._id}`);
+    }
+    await courseFolderModel.deleteMany({ course_id });
+    await courseModel.findByIdAndDelete(course_id);
+    await deleteCache("courses:all");
+    await deleteCache(`course:${course_id}`);
+    return true;
+  };
 }
 
 export const courseService = new CourseService();

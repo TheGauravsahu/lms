@@ -69,3 +69,7 @@ export const editCourseContentSchema = z.object({
 export const deleteCourseContentSchema = z.object({
   folder_id: z.string().min(1, "course_id is required"),
 });
+
+export const deleteCourseSchema = z.object({
+  course_id: z.string().min(1, "course_id is required"),
+});

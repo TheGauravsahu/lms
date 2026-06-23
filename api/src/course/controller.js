@@ -37,7 +37,14 @@ class CourseController {
     const { course_id, edit } = req.body;
     const course = await courseService.editCourseDetails(course_id, edit);
     if (!course) return res.error(404, "Not found", "Course Not found");
-    res.success(200, updatedCourse, "Course edited successfully");
+    res.success(200, course, "Course edited successfully");
+  });
+
+  deleteCourse = asyncHandler(async (req, res) => {
+    const { course_id } = req.body;
+    const result = await courseService.deleteCourse(course_id);
+    if (!result) return res.error(404, "Not Found", "Course not found");
+    res.success(200, null, "Course deleted successfully");
   });
 
   searchCourse = asyncHandler(async (req, res) => {

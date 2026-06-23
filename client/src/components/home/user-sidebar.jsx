@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Home, Settings,Folder } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router";
 
 const items = [
@@ -16,6 +16,11 @@ const items = [
     title: "Home",
     icon: Home,
     href: "/",
+  },
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
   },
   {
     title: "My Courses",

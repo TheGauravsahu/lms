@@ -16,6 +16,8 @@ import MyCourse from "@/pages/MyCourse/MyCourse";
 import { AuthGuard, AdminGuard } from "@/components/auth/AuthGuard";
 import ProfileSettings from "@/pages/Home/ProfileSettings";
 import AdminUploadPage from "@/pages/Admin/AdminUploadPage";
+import StudentsList from "@/pages/Admin/Students/StudentsList";
+import StudentDashboard from "@/pages/Home/StudentDashboard";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -37,6 +39,16 @@ export const router = createBrowserRouter([
             path: "my-account",
             element: <UserLayout />,
             children: [{ index: true, element: <ProfileSettings /> }],
+          },
+          {
+            path: "setting",
+            element: <UserLayout />,
+            children: [{ index: true, element: <ProfileSettings /> }],
+          },
+          {
+            path: "dashboard",
+            element: <UserLayout />,
+            children: [{ index: true, element: <StudentDashboard /> }],
           },
         ],
       },
@@ -94,6 +106,10 @@ export const router = createBrowserRouter([
           {
             path: "uploads",
             element: <AdminUploadPage />,
+          },
+          {
+            path: "students",
+            element: <StudentsList />,
           },
           {
             path: "courses",

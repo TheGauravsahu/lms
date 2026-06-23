@@ -6,6 +6,7 @@ import {
   createCourseFolderSchema,
   createCourseSchema,
   deleteCourseContentSchema,
+  deleteCourseSchema,
   deleteCourseFolderSchema,
   editCourseContentSchema,
   editCourseFolderSchema,
@@ -31,6 +32,11 @@ r.put(
 r.post("/course-details", courseController.getCourseDetails);
 r.get("/all-courses", courseController.getAllCourses);
 r.get("/search-course", courseController.searchCourse);
+r.delete(
+  "/delete-course",
+  validate(deleteCourseSchema),
+  courseController.deleteCourse,
+);
 
 // course_foders routes
 r.post("/course-folders", courseController.getAllCourseFolders);

@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -117,6 +117,36 @@ export const courseApi = {
       },
       mutationFn: async (data) =>
         await apiClient.post("/courses/delete-content", data),
+    });
+  },
+
+  useEditCourse: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["edit-course"],
+      onSuccess: (res) => {
+        toast.success(res.message || "Course updated successfully.");
+        queryClient.invalidateQueries({ queryKey: ["all-courses"] });
+      },
+      mutationFn: async (data) => {
+        const { data: d } = await apiClient.put("/courses/edit-course", data);
+        return d;
+      },
+    });
+  },
+
+  useDeleteCourse: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["delete-course"],
+      onSuccess: (res) => {
+        toast.success(res.message || "Course deleted.");
+        queryClient.invalidateQueries({ queryKey: ["all-courses"] });
+      },
+      mutationFn: async (course_id) => {
+        const { data } = await apiClient.delete("/courses/delete-course", { data: { course_id } });
+        return data;
+      },
     });
   },
 };

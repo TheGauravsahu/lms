@@ -12,6 +12,8 @@ import courseRoutes from "./course/route.js";
 import uploadRoutes from "./uploads/route.js";
 import authRoutes from "./auth/route.js";
 import purchaseRoutes from "./purchase/route.js";
+import studentRoutes from "./students/route.js";
+import adminRoutes from "./admin/route.js";
 
 const app = express();
 
@@ -44,6 +46,8 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/purchases", purchaseRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/health", (req, res) =>
   res.success(200, null, "Server is running successfully."),
