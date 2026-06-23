@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,18 +6,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import EditContent from "./edit-content";
-import { useState } from "react";
-import { Pencil, Trash, MoreVertical } from "lucide-react";
-import DeleteContent from "./delete-content";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
+import EditFolderSheet from "./EditFolderSheet";
+import DeleteFolderDialog from "./DeleteFolderDialog";
 import { useHaptic } from "@/hooks/useHaptic";
 
-const ContentOptionsMenu = ({ prevContent }) => {
+const FolderOptionsMenu = ({ courseId, folder }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const haptic = useHaptic();
 
-  if (!prevContent) return null;
+  if (!folder) return null;
 
   return (
     <>
@@ -26,7 +26,7 @@ const ContentOptionsMenu = ({ prevContent }) => {
             variant="ghost"
             size="icon"
             className="h-8 w-8 cursor-pointer rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground shrink-0"
-            title="Content Options"
+            title="Folder Options"
           >
             <MoreVertical className="w-4 h-4" />
           </Button>
@@ -55,10 +55,22 @@ const ContentOptionsMenu = ({ prevContent }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditContent open={openEdit} onOpenChange={setOpenEdit} prevContent={prevContent} />
-      <DeleteContent open={openDelete} onOpenChange={setOpenDelete} folder_id={prevContent.folder_id} />
+      <EditFolderSheet
+        open={openEdit}
+        onOpenChange={setOpenEdit}
+        courseId={courseId}
+        folder={folder}
+      />
+
+      <DeleteFolderDialog
+        open={openDelete}
+        onOpenChange={setOpenDelete}
+        courseId={courseId}
+        folderId={folder._id}
+        folderTitle={folder.title}
+      />
     </>
   );
 };
 
-export default ContentOptionsMenu;
+export default FolderOptionsMenu;

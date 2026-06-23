@@ -1,9 +1,10 @@
 import { courseApi } from "@/api/courseApi";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+import { Plus, ChevronRight, Folder } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router";
+import FolderOptionsMenu from "@/components/admin/courses/folder/FolderOptionsMenu";
+import EmptyState from "@/components/empty-state";
 
 const FolderDetails = () => {
   const navigate = useNavigate();
@@ -30,6 +31,46 @@ const FolderDetails = () => {
         </section>
       </div>
     );
+
+  if (!data || data.length === 0) {
+    return (
+      <div>
+        {/* header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-2xl">Folders</h2>
+            <div className="border-b-primary border-b-2 pb-1 font-[550] mt-6 w-32">
+              <span className="flex items-center text-foreground">
+                Folder
+                <div className="flex items-center justify-center ml-1 bg-secondary rounded-full text-xs p-1 h-5 w-5">
+                  0
+                </div>
+              </span>
+            </div>
+          </div>
+          {isAdmin && (
+            <Button
+              className="cursor-pointer"
+              onClick={() =>
+                navigate(
+                  `/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`,
+                )
+              }
+            >
+              <Plus /> New Folder
+            </Button>
+          )}
+        </div>
+        <EmptyState
+          title="No Folders Organized"
+          description={isAdmin ? "Create your first folder to organize this section's learning content." : "No folders have been created in this section yet."}
+          icon={Folder}
+          actionLabel={isAdmin ? "Create Folder" : null}
+          onAction={isAdmin ? () => navigate(`/admin/courses/${course_id}/folders/new-folder?parent_id=${folder_id}`) : null}
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -66,8 +107,8 @@ const FolderDetails = () => {
             key={c._id}
             className="bg-card dark:bg-muted/40 border rounded-lg p-3 flex justify-between items-center shadow-2xs hover:shadow-xs transition-shadow"
           >
-            <div className="flex gap-3 items-center min-w-0">
-              <div className="w-16 h-10 overflow-hidden rounded-md shrink-0">
+            <div className="flex gap-3 items-center min-w-0 flex-1">
+              <div className="w-16 h-10 overflow-hidden rounded-md shrink-0 border bg-muted">
                 <img
                   src={c.thumbnail.url}
                   alt={c.title}
@@ -77,26 +118,31 @@ const FolderDetails = () => {
               <span className="font-semibold text-sm truncate text-foreground">{c.title}</span>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="cursor-pointer shrink-0 rounded-full h-8 w-8 hover:bg-secondary"
-              onClick={() =>
-                isAdmin
-                  ? data.parent_id === null
-                    ? navigate(`/admin/courses/${course_id}/folders/${c._id}`)
-                    : navigate(
-                        `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
-                      )
-                  : data.parent_id === null
-                    ? navigate(`/all-courses/${course_id}/folders/${c._id}`)
-                    : navigate(
-                        `/all-courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
-                      )
-              }
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1 shrink-0">
+              {isAdmin && (
+                <FolderOptionsMenu courseId={course_id} folder={c} />
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary"
+                onClick={() =>
+                  isAdmin
+                    ? data.parent_id === null
+                      ? navigate(`/admin/courses/${course_id}/folders/${c._id}`)
+                      : navigate(
+                          `/admin/courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                        )
+                    : data.parent_id === null
+                      ? navigate(`/all-courses/${course_id}/folders/${c._id}`)
+                      : navigate(
+                          `/all-courses/${course_id}/contents?folder_id=${c._id}&parent=${c.title}`,
+                        )
+                }
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </section>

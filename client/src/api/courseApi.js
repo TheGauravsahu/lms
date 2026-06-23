@@ -62,6 +62,32 @@ export const courseApi = {
     });
   },
 
+  useEditFolder: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["edit-folder"],
+      onSuccess: (res) => {
+        toast.success(res.data?.message || "Folder updated successfully.");
+        queryClient.invalidateQueries({ queryKey: ["all-folders"] });
+      },
+      mutationFn: async (data) =>
+        await apiClient.put("/courses/edit-folder", data),
+    });
+  },
+
+  useDeleteFolder: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["delete-folder"],
+      onSuccess: (res) => {
+        toast.success(res.data?.message || "Folder deleted successfully.");
+        queryClient.invalidateQueries({ queryKey: ["all-folders"] });
+      },
+      mutationFn: async (data) =>
+        await apiClient.delete("/courses/delete-folder", { data }),
+    });
+  },
+
   useAllCourseFolders: (course_id, parent_id) => {
     return useQuery({
       queryKey: ["all-folders", course_id, parent_id],

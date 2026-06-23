@@ -269,7 +269,7 @@ const CustomVideoPlayer = ({ url, title }) => {
               </button>
 
               {/* Volume Control */}
-              <div className="flex items-center gap-1.5 group/volume">
+              <div className="flex items-center  group/volume">
                 <button
                   onClick={handleMuteToggle}
                   className="text-white hover:text-orange-500 transition-colors cursor-pointer"
@@ -287,7 +287,7 @@ const CustomVideoPlayer = ({ url, title }) => {
                   step="0.05"
                   value={isMuted ? 0 : volume}
                   onChange={handleVolumeChange}
-                  className="w-0 group-hover/volume:w-16 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-orange-500 transition-all duration-300"
+                  className="ml-3 w-0 group-hover/volume:w-16 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-orange-500 transition-all duration-300"
                 />
               </div>
             </div>

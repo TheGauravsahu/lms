@@ -3,8 +3,9 @@ import { courseApi } from "@/api/courseApi";
 import LoadingScreen from "@/components/loading-screen";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+import { Plus, ChevronRight } from "lucide-react";
+import FolderOptionsMenu from "@/components/admin/courses/folder/FolderOptionsMenu";
+import CourseReviews from "@/components/courses/CourseReviews";
 
 const CourseDetails = () => {
   const location = useLocation();
@@ -50,8 +51,8 @@ const CourseDetails = () => {
             key={c._id}
             className="bg-card dark:bg-muted/40 border rounded-lg p-3 flex justify-between items-center shadow-2xs hover:shadow-xs transition-shadow"
           >
-            <div className="flex gap-3 items-center min-w-0">
-              <div className="w-16 h-10 overflow-hidden rounded-md shrink-0">
+            <div className="flex gap-3 items-center min-w-0 flex-1">
+              <div className="w-16 h-10 overflow-hidden rounded-md shrink-0 border bg-muted">
                 <img
                   src={c.thumbnail.url}
                   alt={c.title}
@@ -61,23 +62,29 @@ const CourseDetails = () => {
               <span className="font-semibold text-sm truncate text-foreground">{c.title}</span>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="cursor-pointer shrink-0 rounded-full h-8 w-8 hover:bg-secondary"
-              onClick={() =>
-                navigate(
-                  isAdmin
-                    ? `/admin/courses/${course_id}/folders/${c._id}`
-                    : `/all-courses/${course_id}/folders/${c._id}`,
-                )
-              }
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1 shrink-0">
+              {isAdmin && (
+                <FolderOptionsMenu courseId={course_id} folder={c} />
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary"
+                onClick={() =>
+                  navigate(
+                    isAdmin
+                      ? `/admin/courses/${course_id}/folders/${c._id}`
+                      : `/all-courses/${course_id}/folders/${c._id}`,
+                  )
+                }
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </section>
+      <CourseReviews courseId={course_id} />
     </div>
   );
 };

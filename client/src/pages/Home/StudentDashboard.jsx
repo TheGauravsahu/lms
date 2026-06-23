@@ -8,11 +8,98 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useQueries } from "@tanstack/react-query";
+import { progressApi } from "@/api/progressApi";
+import { apiClient } from "@/lib/axios";
+import CertificateModal from "@/components/courses/CertificateModal";
+import { useState } from "react";
+
+const CourseCardFooter = ({ course, navigate }) => {
+  const { data: progressData } = progressApi.useGetProgress(course._id);
+  const progress = progressData?.progress_percentage ?? 0;
+  const [isCertOpen, setIsCertOpen] = useState(false);
+
+  return (
+    <>
+      <div className="mt-3">
+        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+          <span>Progress</span>
+          <span>{progress}%</span>
+        </div>
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-linear-to-r from-orange-400 to-red-500 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-2 mt-3">
+        <Button
+          onClick={() => navigate("/all-courses/" + course._id)}
+          className={`cursor-pointer rounded-md text-xs h-8 ${
+            progress === 100
+              ? "w-1/2 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              : "w-full bg-linear-to-b from-orange-400 to-red-500 text-white"
+          }`}
+        >
+          {progress === 100 ? "Review" : "Continue"} <ArrowRight className="w-3 h-3 ml-1" />
+        </Button>
+
+        {progress === 100 && (
+          <Button
+            onClick={() => setIsCertOpen(true)}
+            className="w-1/2 bg-linear-to-b from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white cursor-pointer rounded-md text-xs h-8"
+          >
+            Certificate
+          </Button>
+        )}
+      </div>
+
+      <CertificateModal
+        isOpen={isCertOpen}
+        onClose={() => setIsCertOpen(false)}
+        courseTitle={course.title}
+      />
+    </>
+  );
+};
 
 const StudentDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { data: courses, isPending } = purchaseApi.useGetMyPurchasedCourses();
+
+  const progressQueries = useQueries({
+    queries: (courses || []).map((c) => ({
+      queryKey: ["course-progress", c._id],
+      queryFn: async () => {
+        const token = useAuthStore.getState().token;
+        const { data } = await apiClient.get(`/progress/${c._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        return data.data;
+      },
+      enabled: !!c._id,
+    })),
+  });
+
+  const enrolledCount = courses?.length ?? 0;
+  const isProgressPending = progressQueries.some((q) => q.isPending);
+
+  let inProgressCount = 0;
+  let completedCount = 0;
+
+  progressQueries.forEach((q) => {
+    if (q.data) {
+      const percentage = q.data.progress_percentage ?? 0;
+      if (percentage === 100) {
+        completedCount++;
+      } else if (percentage > 0) {
+        inProgressCount++;
+      }
+    }
+  });
 
   const hour = new Date().getHours();
   const greeting =
@@ -55,21 +142,21 @@ const StudentDashboard = () => {
         {[
           {
             label: "Enrolled Courses",
-            value: courses?.length ?? "—",
+            value: enrolledCount || "—",
             icon: BookOpen,
             color: "text-orange-500",
             bg: "bg-orange-50 dark:bg-orange-950/30",
           },
           {
             label: "In Progress",
-            value: courses?.length ?? "—",
+            value: isPending || isProgressPending ? "—" : inProgressCount,
             icon: GraduationCap,
             color: "text-blue-500",
             bg: "bg-blue-50 dark:bg-blue-950/30",
           },
           {
             label: "Completed",
-            value: 0,
+            value: isPending || isProgressPending ? "—" : completedCount,
             icon: GraduationCap,
             color: "text-green-500",
             bg: "bg-green-50 dark:bg-green-950/30",
@@ -152,26 +239,7 @@ const StudentDashboard = () => {
                       ₹{c.offer_price}
                     </span>
                   </div>
-                  {/* Progress bar placeholder */}
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Progress</span>
-                      <span>0%</span>
-                    </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-linear-to-r from-orange-400 to-red-500 rounded-full"
-                        style={{ width: "0%" }}
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => navigate("/all-courses/" + c._id)}
-                    className="w-full mt-3 cursor-pointer rounded-sm bg-linear-to-b from-orange-400 to-red-500 text-white text-sm"
-                  >
-                    Continue Learning{" "}
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
+                  <CourseCardFooter course={c} navigate={navigate} />
                 </div>
               </div>
             ))}
