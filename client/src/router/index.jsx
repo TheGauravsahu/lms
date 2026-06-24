@@ -48,6 +48,9 @@ import PublicProfile from "@/pages/Home/PublicProfile";
 import ResumeBuilder from "@/pages/Home/ResumeBuilder";
 import JobBoard from "@/pages/Home/JobBoard";
 import MockInterview from "@/pages/Home/MockInterview";
+import AdminJobs from "@/pages/Admin/Jobs";
+import AdminFlashcards from "@/pages/Admin/Flashcards";
+import AdminInterviews from "@/pages/Admin/Interviews";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -217,6 +220,18 @@ export const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <AdminDashboard /> },
+          {
+            path: "jobs",
+            element: <AdminJobs />,
+          },
+          {
+            path: "flashcards",
+            element: <AdminFlashcards />,
+          },
+          {
+            path: "interviews",
+            element: <AdminInterviews />,
+          },
           {
             path: "setting",
             element: <ProfileSettings />,

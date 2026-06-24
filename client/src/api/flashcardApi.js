@@ -67,4 +67,28 @@ export const flashcardApi = {
       },
     });
   },
+
+  useAdminGetAllSets: () => {
+    return useQuery({
+      queryKey: ["admin-flashcard-sets"],
+      queryFn: async () => {
+        const { data } = await apiClient.get("/flashcards/admin/all");
+        return data.data;
+      },
+    });
+  },
+
+  useAdminDeleteSet: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["admin-delete-flashcard-set"],
+      onSuccess: (res) => {
+        toast.success(res.data?.message || "Flashcard set deleted successfully!");
+        queryClient.invalidateQueries({ queryKey: ["admin-flashcard-sets"] });
+      },
+      mutationFn: async (id) => {
+        return await apiClient.delete(`/flashcards/admin/${id}`);
+      },
+    });
+  },
 };

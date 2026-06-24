@@ -108,6 +108,22 @@ Generate between 5 to 10 high-quality cards. Do not output any markup prefix, ma
 
     res.success(200, set, "Card mastery toggled.");
   });
+
+  adminGetAllSets = asyncHandler(async (req, res) => {
+    const sets = await flashcardSetModel.find()
+      .populate("user_id", "email")
+      .sort({ createdAt: -1 });
+    res.success(200, sets, "Admin all flashcard sets fetched successfully");
+  });
+
+  adminDeleteSet = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const set = await flashcardSetModel.findByIdAndDelete(id);
+    if (!set) {
+      return res.error(404, "Not Found", "Flashcard set not found.");
+    }
+    res.success(200, null, "Flashcard set deleted successfully by admin.");
+  });
 }
 
 export const flashcardController = new FlashcardController();

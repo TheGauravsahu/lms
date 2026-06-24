@@ -99,4 +99,42 @@ export const careerApi = {
       },
     });
   },
+
+  useAdminCreateJob: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["admin-create-job"],
+      onSuccess: (res) => {
+        toast.success(res.data?.message || "Job created successfully!");
+        queryClient.invalidateQueries({ queryKey: ["career-jobs"] });
+      },
+      mutationFn: async (jobData) => {
+        return await apiClient.post("/career/admin/jobs", jobData);
+      },
+    });
+  },
+
+  useAdminDeleteJob: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationKey: ["admin-delete-job"],
+      onSuccess: (res) => {
+        toast.success(res.data?.message || "Job deleted successfully!");
+        queryClient.invalidateQueries({ queryKey: ["career-jobs"] });
+      },
+      mutationFn: async (id) => {
+        return await apiClient.delete(`/career/admin/jobs/${id}`);
+      },
+    });
+  },
+
+  useAdminGetInterviews: () => {
+    return useQuery({
+      queryKey: ["admin-interview-history"],
+      queryFn: async () => {
+        const { data } = await apiClient.get("/career/admin/interviews");
+        return data.data;
+      },
+    });
+  },
 };

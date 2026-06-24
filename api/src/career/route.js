@@ -1,6 +1,6 @@
 import express from "express";
 import { careerController } from "./controller.js";
-import { verifyToken } from "../middleware/auth.js";
+import { verifyToken, verifyRoles } from "../middleware/auth.js";
 
 const r = express.Router();
 
@@ -17,5 +17,10 @@ r.post("/interview/start", careerController.startMockInterview);
 r.get("/interview/active", careerController.getActiveInterview);
 r.post("/interview/respond", careerController.submitInterviewResponse);
 r.get("/interview/history", careerController.getInterviewsHistory);
+
+// Admin-only career routes
+r.post("/admin/jobs", verifyRoles("ADMIN"), careerController.adminCreateJob);
+r.delete("/admin/jobs/:id", verifyRoles("ADMIN"), careerController.adminDeleteJob);
+r.get("/admin/interviews", verifyRoles("ADMIN"), careerController.adminGetInterviews);
 
 export default r;

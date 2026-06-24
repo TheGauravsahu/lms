@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { learnerProfileModel, jobBoardModel, mockInterviewModel } from "./model.js";
 import { generateGeminiContent } from "../utils/gemini.js";
+import { accountModel } from "../auth/model.js";
 
 class CareerController {
   getProfile = asyncHandler(async (req, res) => {
@@ -8,8 +9,15 @@ class CareerController {
     let profile = await learnerProfileModel.findOne({ user_id: userId });
 
     if (!profile) {
-      // Create a default initial profile using account username
-      const username = req.account.email.split("@")[0] + "_" + Math.floor(100 + Math.random() * 900);
+      // Find the account document to get email and name
+      const accountDoc = await accountModel.findById(userId);
+      const email = accountDoc?.email || "";
+      const baseName = (email && email.includes("@"))
+        ? email.split("@")[0]
+        : (accountDoc?.name ? accountDoc.name.replace(/\s+/g, "").toLowerCase() : "learner");
+      
+      const username = baseName + "_" + Math.floor(100 + Math.random() * 900);
+      
       profile = await learnerProfileModel.create({
         user_id: userId,
         username,
@@ -23,7 +31,7 @@ class CareerController {
         resume: {
           experience: [],
           education: [],
-          contactEmail: req.account.email,
+          contactEmail: email,
         }
       });
     }
@@ -236,6 +244,39 @@ Look at the candidate's response to your last question, briefly provide context 
     const userId = req.account.account_id;
     const history = await mockInterviewModel.find({ user_id: userId, status: "COMPLETED" }).sort({ createdAt: -1 });
     res.success(200, history, "Mock interview history fetched.");
+  });
+
+  adminCreateJob = asyncHandler(async (req, res) => {
+    const { title, company, location, description, requirements, apply_url } = req.body;
+    if (!title || !company || !location || !description || !apply_url) {
+      return res.error(400, "Validation Error", "All fields are required.");
+    }
+    const reqs = Array.isArray(requirements) ? requirements : (requirements ? requirements.split(",").map(r => r.trim()) : []);
+    const job = await jobBoardModel.create({
+      title,
+      company,
+      location,
+      description,
+      requirements: reqs,
+      apply_url
+    });
+    res.success(201, job, "Job post created successfully by admin.");
+  });
+
+  adminDeleteJob = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const job = await jobBoardModel.findByIdAndDelete(id);
+    if (!job) {
+      return res.error(404, "Not Found", "Job post not found.");
+    }
+    res.success(200, null, "Job post deleted successfully by admin.");
+  });
+
+  adminGetInterviews = asyncHandler(async (req, res) => {
+    const history = await mockInterviewModel.find()
+      .populate("user_id", "email")
+      .sort({ createdAt: -1 });
+    res.success(200, history, "Admin all mock interview history fetched.");
   });
 }
 

@@ -16,7 +16,7 @@ const profileSchema = new mongoose.Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user_accounts",
       required: true,
       unique: true,
     },
@@ -54,7 +54,7 @@ const profileSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const jobSchema = new mongoose.Schema(
@@ -66,18 +66,22 @@ const jobSchema = new mongoose.Schema(
     requirements: [{ type: String }],
     apply_url: { type: String, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const interviewSchema = new mongoose.Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user_accounts",
       required: true,
     },
     role: { type: String, required: true },
-    status: { type: String, enum: ["STARTED", "COMPLETED"], default: "STARTED" },
+    status: {
+      type: String,
+      enum: ["STARTED", "COMPLETED"],
+      default: "STARTED",
+    },
     chatLog: [
       {
         role: { type: String, enum: ["user", "model"], required: true },
@@ -92,9 +96,15 @@ const interviewSchema = new mongoose.Schema(
       detailedFeedback: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const learnerProfileModel = mongoose.model("learner_profiles", profileSchema);
+export const learnerProfileModel = mongoose.model(
+  "learner_profiles",
+  profileSchema,
+);
 export const jobBoardModel = mongoose.model("job_board", jobSchema);
-export const mockInterviewModel = mongoose.model("mock_interviews", interviewSchema);
+export const mockInterviewModel = mongoose.model(
+  "mock_interviews",
+  interviewSchema,
+);

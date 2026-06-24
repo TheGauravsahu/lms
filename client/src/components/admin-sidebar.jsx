@@ -21,6 +21,9 @@ import {
   Code2,
   Trophy,
   Megaphone,
+  Briefcase,
+  Layers,
+  History,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -42,6 +45,12 @@ const communityItems = [
 
 const gamificationItems = [
   { title: "Leaderboard", icon: Trophy, href: "/admin/leaderboard" },
+];
+
+const careerItems = [
+  { title: "Manage Jobs", icon: Briefcase, href: "/admin/jobs" },
+  { title: "Flashcard Decks", icon: Layers, href: "/admin/flashcards" },
+  { title: "Mock Interviews", icon: History, href: "/admin/interviews" },
 ];
 
 const AdminSidebar = () => {
@@ -87,6 +96,13 @@ const AdminSidebar = () => {
             Gamification
           </SidebarGroupLabel>
           <SidebarMenu>{renderItems(gamificationItems)}</SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2 pb-1">
+            Career & Productivity
+          </SidebarGroupLabel>
+          <SidebarMenu>{renderItems(careerItems)}</SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />

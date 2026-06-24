@@ -2,11 +2,41 @@ import { useState, useEffect, useRef } from "react";
 import { courseApi } from "@/api/courseApi";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronRight, X, CheckCircle2, Circle, FileText, Sparkles, Bot, Brain, Loader2, Send, User, Copy, Check, Calendar, ArrowRight, Terminal } from "lucide-react";
+import {
+  Plus,
+  ChevronRight,
+  X,
+  CheckCircle2,
+  Circle,
+  FileText,
+  Sparkles,
+  Bot,
+  Brain,
+  Loader2,
+  Send,
+  User,
+  Copy,
+  Check,
+  Calendar,
+  ArrowRight,
+  Terminal,
+} from "lucide-react";
 import { productivityApi } from "@/api/productivityApi";
 import { aiApi } from "@/api/aiApi";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   useLocation,
   useNavigate,
@@ -22,6 +52,7 @@ import ContentComments from "@/components/courses/ContentComments";
 import EmptyState from "@/components/empty-state";
 import CertificateModal from "@/components/courses/CertificateModal";
 import QuizPlayer from "@/components/courses/QuizPlayer";
+import { Input } from "@/components/ui/input";
 
 // A simple markdown-like formatter to render tutor responses beautifully
 const FormattedMessage = ({ text }) => {
@@ -47,7 +78,10 @@ const FormattedMessage = ({ text }) => {
           const code = lines.slice(1, -1).join("\n");
 
           return (
-            <div key={index} className="rounded-xl border border-muted/50 overflow-hidden my-3 shadow-2xs">
+            <div
+              key={index}
+              className="rounded-xl border border-muted/50 overflow-hidden my-3 shadow-2xs"
+            >
               <div className="bg-muted px-4 py-1.5 flex justify-between items-center border-b border-muted/40">
                 <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <Terminal className="w-3.5 h-3.5 text-orange-500" />
@@ -76,7 +110,10 @@ const FormattedMessage = ({ text }) => {
         return (
           <div key={index} className="space-y-1">
             {lines.map((line, lIdx) => {
-              if (line.trim().startsWith("* ") || line.trim().startsWith("- ")) {
+              if (
+                line.trim().startsWith("* ") ||
+                line.trim().startsWith("- ")
+              ) {
                 const content = line.trim().substring(2);
                 return (
                   <ul key={lIdx} className="list-disc pl-5 my-1">
@@ -108,7 +145,10 @@ const renderInlineStyles = (line) => {
     return codeParts.map((cPart, cIdx) => {
       if (cPart.startsWith("`") && cPart.endsWith("`")) {
         return (
-          <code key={cIdx} className="bg-muted text-xs px-1.5 py-0.5 rounded-sm font-mono text-orange-600 dark:text-orange-400 font-semibold">
+          <code
+            key={cIdx}
+            className="bg-muted text-xs px-1.5 py-0.5 rounded-sm font-mono text-orange-600 dark:text-orange-400 font-semibold"
+          >
             {cPart.substring(1, cPart.length - 1)}
           </code>
         );
@@ -146,14 +186,15 @@ const ContentDetails = () => {
 
   const tutorMessagesEndRef = useRef(null);
 
-  const { data: tutorSessionDetails } = aiApi.useGetChatSessionDetails(tutorSessionId);
+  const { data: tutorSessionDetails } =
+    aiApi.useGetChatSessionDetails(tutorSessionId);
   const sendTutorMessageMutation = aiApi.useSendChatMessage();
   const generateNotesMutation = aiApi.useGenerateNotes();
   const generateQuizMutation = aiApi.useGenerateQuiz();
 
   // Fetch tutor sessions list to sync active tutor session for this lesson
   const { data: sessions } = aiApi.useGetChatSessions();
-  
+
   useEffect(() => {
     if (sessions && activeVideo) {
       const matching = sessions.find((s) => s.lessonId === activeVideo.id);
@@ -189,7 +230,7 @@ const ContentDetails = () => {
             setTutorSessionId(session._id);
           }
         },
-      }
+      },
     );
   };
 
@@ -203,7 +244,7 @@ const ContentDetails = () => {
           setNotesText(data.notes);
           setNotesOpen(true);
         },
-      }
+      },
     );
   };
 
@@ -220,7 +261,7 @@ const ContentDetails = () => {
           setPracticeQuizIdx(0);
           setQuizOpen(true);
         },
-      }
+      },
     );
   };
 
@@ -233,9 +274,11 @@ const ContentDetails = () => {
 
   const { course_id } = useParams();
   const earnMutation = studentApi.useEarnRewards();
-  
+
   // Progress Query & Mutation
-  const { data: progressData } = progressApi.useGetProgress(!isAdmin ? course_id : null);
+  const { data: progressData } = progressApi.useGetProgress(
+    !isAdmin ? course_id : null,
+  );
   const { data: courseDetails } = courseApi.useGetCourseDetails(course_id);
   const courseTitle = courseDetails?.overview?.title || "This Course";
   const toggleProgressMutation = progressApi.useToggleProgress();
@@ -250,15 +293,17 @@ const ContentDetails = () => {
     if (play && data && !activeVideo) {
       const match = data.find((c) => c._id === play);
       if (match && match.content_type === "VIDEO") {
-        const savedItem = videoProgress?.find((vp) => vp.contentId?._id === play);
+        const savedItem = videoProgress?.find(
+          (vp) => vp.contentId?._id === play,
+        );
         const initialTime = savedItem ? savedItem.playbackTime : 0;
-        
+
         setActiveQuiz(null);
         setActiveVideo({
           url: match.content?.url || match.content,
           title: match.title,
           id: match._id,
-          initialTime
+          initialTime,
         });
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -297,7 +342,7 @@ const ContentDetails = () => {
             earnMutation.mutate({ xp: 20, badge: "Knowledge Seeker" });
           }
         },
-      }
+      },
     );
   };
 
@@ -308,7 +353,9 @@ const ContentDetails = () => {
         <div className="bg-card border rounded-xl p-4 shadow-sm space-y-2 animate-in fade-in duration-300">
           <div className="flex items-center justify-between text-sm font-semibold">
             <span className="text-foreground">Course Completion Progress</span>
-            <span className="text-orange-500">{progressData.progress_percentage}%</span>
+            <span className="text-orange-500">
+              {progressData.progress_percentage}%
+            </span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
@@ -371,7 +418,8 @@ const ContentDetails = () => {
                 className="text-xs h-8 cursor-pointer rounded-lg hover:bg-muted font-bold"
                 onClick={() => setTutorOpen(true)}
               >
-                <Bot className="w-3.5 h-3.5 mr-1.5 text-orange-500" /> Explain Topic
+                <Bot className="w-3.5 h-3.5 mr-1.5 text-orange-500" /> Explain
+                Topic
               </Button>
               <Button
                 variant="outline"
@@ -403,7 +451,7 @@ const ContentDetails = () => {
               </Button>
             </div>
           )}
-          
+
           {/* Discussion comments underneath video player */}
           <ContentComments contentId={activeVideo.id} />
         </div>
@@ -434,7 +482,7 @@ const ContentDetails = () => {
               }
             }}
           />
-          
+
           {/* Discussion comments underneath quiz */}
           <ContentComments contentId={activeQuiz.id} />
         </div>
@@ -483,10 +531,21 @@ const ContentDetails = () => {
       {data.length === 0 ? (
         <EmptyState
           title={`No ${parent || "Content"} Available`}
-          description={isAdmin ? "Create subfolders or upload files to populate this section." : "No learning materials have been posted in this section yet."}
+          description={
+            isAdmin
+              ? "Create subfolders or upload files to populate this section."
+              : "No learning materials have been posted in this section yet."
+          }
           icon={FileText}
           actionLabel={isAdmin ? `Add New ${parent || "Content"}` : null}
-          onAction={isAdmin ? () => navigate(`/admin/courses/${course_id}/contents/new-content?folder_id=${folder_id}`) : null}
+          onAction={
+            isAdmin
+              ? () =>
+                  navigate(
+                    `/admin/courses/${course_id}/contents/new-content?folder_id=${folder_id}`,
+                  )
+              : null
+          }
         />
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-6">
@@ -504,7 +563,9 @@ const ContentDetails = () => {
                     <button
                       onClick={() => handleToggleComplete(c._id)}
                       className="cursor-pointer text-muted-foreground hover:text-green-500 transition-colors shrink-0"
-                      title={isCompleted ? "Mark as Incomplete" : "Mark as Completed"}
+                      title={
+                        isCompleted ? "Mark as Incomplete" : "Mark as Completed"
+                      }
                     >
                       {isCompleted ? (
                         <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-50/10" />
@@ -513,20 +574,20 @@ const ContentDetails = () => {
                       )}
                     </button>
                   )}
-                  
+
                   <div className="w-16 h-10 overflow-hidden rounded-md shrink-0 border bg-muted">
                     <img
                       src={
-                        c.thumbnail
-                          ? c.thumbnail.url
-                          : "/course_banner_bg.png"
+                        c.thumbnail ? c.thumbnail.url : "/course_banner_bg.png"
                       }
                       alt={c.title}
                       className="h-full w-full object-cover"
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className={`font-semibold text-sm truncate block text-foreground ${isCompleted && !isAdmin ? "line-through text-muted-foreground" : ""}`}>
+                    <span
+                      className={`font-semibold text-sm truncate block text-foreground ${isCompleted && !isAdmin ? "line-through text-muted-foreground" : ""}`}
+                    >
                       {c.title}
                     </span>
                     <span className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider">
@@ -536,12 +597,14 @@ const ContentDetails = () => {
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0">
-                  {isAdmin && (
-                    <ContentOptionsMenu prevContent={c} />
-                  )}
+                  {isAdmin && <ContentOptionsMenu prevContent={c} />}
                   {isPdf ? (
                     <PdfViewerDialog pdfUrl={c.content.url} title={c.title}>
-                      <Button variant="ghost" size="icon" className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary"
+                      >
                         <ChevronRight className="w-4 h-4 text-orange-500" />
                       </Button>
                     </PdfViewerDialog>
@@ -550,17 +613,23 @@ const ContentDetails = () => {
                       variant="ghost"
                       size="icon"
                       className={`cursor-pointer rounded-full h-8 w-8 hover:bg-secondary ${
-                        activeVideo?.id === c._id ? "text-orange-500 bg-secondary" : ""
+                        activeVideo?.id === c._id
+                          ? "text-orange-500 bg-secondary"
+                          : ""
                       }`}
                       onClick={() => {
                         setActiveQuiz(null); // Close quiz if video opened
-                        const savedItem = videoProgress?.find((vp) => vp.contentId?._id === c._id);
-                        const initialTime = savedItem ? savedItem.playbackTime : 0;
+                        const savedItem = videoProgress?.find(
+                          (vp) => vp.contentId?._id === c._id,
+                        );
+                        const initialTime = savedItem
+                          ? savedItem.playbackTime
+                          : 0;
                         setActiveVideo({
                           url: c.content?.url || c.content,
                           title: c.title,
                           id: c._id,
-                          initialTime
+                          initialTime,
                         });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
@@ -572,19 +641,34 @@ const ContentDetails = () => {
                       variant="ghost"
                       size="icon"
                       className={`cursor-pointer rounded-full h-8 w-8 hover:bg-secondary ${
-                        activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "text-orange-500 bg-secondary" : ""
+                        activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id)
+                          ? "text-orange-500 bg-secondary"
+                          : ""
                       }`}
                       onClick={() => {
                         setActiveVideo(null); // Close video if quiz opened
-                        setActiveQuiz({ quizId: c.quiz_id?._id || c.quiz_id, title: c.title, id: c._id });
+                        setActiveQuiz({
+                          quizId: c.quiz_id?._id || c.quiz_id,
+                          title: c.title,
+                          id: c._id,
+                        });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
                       <ChevronRight className="w-4 h-4 text-orange-500" />
                     </Button>
                   ) : (
-                    <Button variant="ghost" size="icon" className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary" asChild>
-                      <a href={c.content?.url || ""} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary"
+                      asChild
+                    >
+                      <a
+                        href={c.content?.url || ""}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ChevronRight className="w-4 h-4" />
                       </a>
                     </Button>
@@ -597,7 +681,10 @@ const ContentDetails = () => {
               <div
                 key={c._id}
                 className={`bg-card dark:bg-muted/40 border rounded-lg p-3 shadow-2xs hover:shadow-xs transition-all ${
-                  activeVideo?.id === c._id || activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id) ? "border-orange-500 ring-1 ring-orange-500/50" : ""
+                  activeVideo?.id === c._id ||
+                  activeQuiz?.quizId === (c.quiz_id?._id || c.quiz_id)
+                    ? "border-orange-500 ring-1 ring-orange-500/50"
+                    : ""
                 } ${isCompleted && !isAdmin ? "opacity-90 border-green-500/30 bg-green-500/2 dark:bg-green-500/1" : ""}`}
               >
                 {cardContent}
@@ -620,7 +707,9 @@ const ContentDetails = () => {
               <Bot className="w-5 h-5" />
             </div>
             <div>
-              <SheetTitle className="text-sm font-extrabold text-foreground">AI Topic Tutor</SheetTitle>
+              <SheetTitle className="text-sm font-extrabold text-foreground">
+                AI Topic Tutor
+              </SheetTitle>
               <span className="text-[10px] text-muted-foreground font-semibold block">
                 Lesson: {activeVideo?.title}
               </span>
@@ -629,13 +718,18 @@ const ContentDetails = () => {
 
           {/* Messages log */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-            {!tutorSessionId && (!tutorSessionDetails || tutorSessionDetails.messages.length === 0) ? (
+            {!tutorSessionId &&
+            (!tutorSessionDetails ||
+              tutorSessionDetails.messages.length === 0) ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-4">
                 <Sparkles className="w-8 h-8 text-orange-500 fill-orange-500/10" />
                 <div className="space-y-1">
-                  <h4 className="font-extrabold text-sm text-foreground">Ask me anything!</h4>
+                  <h4 className="font-extrabold text-sm text-foreground">
+                    Ask me anything!
+                  </h4>
                   <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">
-                    I can explain recursion simply, summarize this video, or generate practice questions based on this lesson.
+                    I can explain recursion simply, summarize this video, or
+                    generate practice questions based on this lesson.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 gap-2 w-full pt-2">
@@ -667,10 +761,16 @@ const ContentDetails = () => {
                     >
                       <div
                         className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[9px] ${
-                          isUser ? "bg-orange-500 text-white" : "bg-muted text-muted-foreground border"
+                          isUser
+                            ? "bg-orange-500 text-white"
+                            : "bg-muted text-muted-foreground border"
                         }`}
                       >
-                        {isUser ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3 text-orange-500" />}
+                        {isUser ? (
+                          <User className="w-3 h-3" />
+                        ) : (
+                          <Bot className="w-3 h-3 text-orange-500" />
+                        )}
                       </div>
                       <div
                         className={`rounded-2xl p-3 shadow-3xs border text-xs ${
@@ -692,7 +792,9 @@ const ContentDetails = () => {
                     </div>
                     <div className="bg-card border border-border/70 rounded-2xl p-3 shadow-3xs flex items-center gap-1.5">
                       <Loader2 className="w-3 h-3 animate-spin text-orange-500" />
-                      <span className="text-[10px] text-muted-foreground font-semibold">Tutor is writing...</span>
+                      <span className="text-[10px] text-muted-foreground font-semibold">
+                        Tutor is writing...
+                      </span>
                     </div>
                   </div>
                 )}
@@ -702,10 +804,15 @@ const ContentDetails = () => {
           </div>
 
           {/* Form input */}
-          <form onSubmit={handleSendTutorMessage} className="p-3 border-t bg-muted/5 flex gap-2">
+          <form
+            onSubmit={handleSendTutorMessage}
+            className="p-3 border-t bg-muted/5 flex gap-2"
+          >
             <Input
               placeholder={
-                sendTutorMessageMutation.isPending ? "Generating response..." : "Ask the AI tutor..."
+                sendTutorMessageMutation.isPending
+                  ? "Generating response..."
+                  : "Ask the AI tutor..."
               }
               value={tutorInput}
               onChange={(e) => setTutorInput(e.target.value)}
@@ -714,7 +821,9 @@ const ContentDetails = () => {
             />
             <Button
               type="submit"
-              disabled={!tutorInput.trim() || sendTutorMessageMutation.isPending}
+              disabled={
+                !tutorInput.trim() || sendTutorMessageMutation.isPending
+              }
               className="h-9 w-9 bg-linear-to-b from-orange-400 to-red-500 text-white rounded-xl cursor-pointer p-0 flex items-center justify-center"
             >
               {sendTutorMessageMutation.isPending ? (
@@ -736,7 +845,8 @@ const ContentDetails = () => {
               AI Study Notes: {activeVideo?.title}
             </DialogTitle>
             <DialogDescription>
-              Gemini-synthesized concise learning concepts, takeaways, and code syntax references.
+              Gemini-synthesized concise learning concepts, takeaways, and code
+              syntax references.
             </DialogDescription>
           </DialogHeader>
 
@@ -782,14 +892,17 @@ const ContentDetails = () => {
               Practice Quiz: {activeVideo?.title}
             </DialogTitle>
             <DialogDescription>
-              Test your understanding of the concepts explained in this video lesson.
+              Test your understanding of the concepts explained in this video
+              lesson.
             </DialogDescription>
           </DialogHeader>
 
           {generateQuizMutation.isPending ? (
             <div className="py-12 flex flex-col items-center justify-center space-y-4">
               <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
-              <span className="text-xs text-muted-foreground font-semibold">Gemini is writing quiz questions...</span>
+              <span className="text-xs text-muted-foreground font-semibold">
+                Gemini is writing quiz questions...
+              </span>
             </div>
           ) : !generatedQuiz || !generatedQuiz.questions ? (
             <div className="py-6 text-center text-xs text-muted-foreground">
@@ -801,7 +914,8 @@ const ContentDetails = () => {
               {/* Question display */}
               <div className="space-y-3">
                 <span className="text-xs bg-muted text-muted-foreground font-bold px-2 py-0.5 rounded-full">
-                  Question {practiceQuizIdx + 1} of {generatedQuiz.questions.length}
+                  Question {practiceQuizIdx + 1} of{" "}
+                  {generatedQuiz.questions.length}
                 </span>
                 <h4 className="font-extrabold text-sm text-foreground">
                   {generatedQuiz.questions[practiceQuizIdx].question}
@@ -810,27 +924,30 @@ const ContentDetails = () => {
 
               {/* Options list */}
               <div className="grid grid-cols-1 gap-2.5">
-                {generatedQuiz.questions[practiceQuizIdx].options?.map((option, idx) => {
-                  const isSelected = practiceQuizAnswers[practiceQuizIdx] === option;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() =>
-                        setPracticeQuizAnswers((prev) => ({
-                          ...prev,
-                          [practiceQuizIdx]: option,
-                        }))
-                      }
-                      className={`w-full text-left p-3.5 border rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        isSelected
-                          ? "bg-orange-500/10 border-orange-500 text-orange-600 shadow-2xs"
-                          : "bg-card border-border/70 hover:bg-muted/30 text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
+                {generatedQuiz.questions[practiceQuizIdx].options?.map(
+                  (option, idx) => {
+                    const isSelected =
+                      practiceQuizAnswers[practiceQuizIdx] === option;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() =>
+                          setPracticeQuizAnswers((prev) => ({
+                            ...prev,
+                            [practiceQuizIdx]: option,
+                          }))
+                        }
+                        className={`w-full text-left p-3.5 border rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-orange-500/10 border-orange-500 text-orange-600 shadow-2xs"
+                            : "bg-card border-border/70 hover:bg-muted/30 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  },
+                )}
               </div>
 
               {/* Navigation controls */}
@@ -894,25 +1011,38 @@ const ContentDetails = () => {
                   const selected = practiceQuizAnswers[idx];
                   const isCorrect = selected === q.answer;
                   return (
-                    <div key={idx} className="bg-card border border-border/80 rounded-xl p-4 space-y-3">
+                    <div
+                      key={idx}
+                      className="bg-card border border-border/80 rounded-xl p-4 space-y-3"
+                    >
                       <div className="flex gap-2 items-center">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 ${
-                          isCorrect ? "bg-green-500" : "bg-red-500"
-                        }`}>
+                        <span
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 ${
+                            isCorrect ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        >
                           {idx + 1}
                         </span>
                         <h5 className="font-extrabold text-xs text-foreground line-clamp-2">
                           {q.question}
                         </h5>
                       </div>
-                      
+
                       <div className="text-[11px] font-semibold space-y-1 pl-7">
-                        <p className={isCorrect ? "text-green-600" : "text-red-500"}>
-                          Your choice: <span className="font-bold">{selected || "Not Answered"}</span>
+                        <p
+                          className={
+                            isCorrect ? "text-green-600" : "text-red-500"
+                          }
+                        >
+                          Your choice:{" "}
+                          <span className="font-bold">
+                            {selected || "Not Answered"}
+                          </span>
                         </p>
                         {!isCorrect && (
                           <p className="text-green-600">
-                            Correct choice: <span className="font-bold">{q.answer}</span>
+                            Correct choice:{" "}
+                            <span className="font-bold">{q.answer}</span>
                           </p>
                         )}
                       </div>
