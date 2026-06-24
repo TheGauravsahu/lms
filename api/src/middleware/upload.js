@@ -10,7 +10,7 @@ export const uploadMiddleware = async (req, res, next) => {
     const result = await imagekit.files.upload({
       file: await toFile(req.file.buffer, req.file.originalname),
       fileName: req.file.originalname,
-      folder: "/lms_uploads",
+      folder: env.NODE_ENV === "prod" ? "/lms_prod" : "lms_uploads",
     });
 
     const upload = {
