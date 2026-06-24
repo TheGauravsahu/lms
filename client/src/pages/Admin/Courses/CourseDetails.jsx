@@ -3,9 +3,12 @@ import { courseApi } from "@/api/courseApi";
 import LoadingScreen from "@/components/loading-screen";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronRight } from "lucide-react";
+import { Plus, ChevronRight, Lock } from "lucide-react";
 import FolderOptionsMenu from "@/components/admin/courses/folder/FolderOptionsMenu";
 import CourseReviews from "@/components/courses/CourseReviews";
+import { useAuthStore } from "@/store/auth";
+import { purchaseApi } from "@/api/purchaseApi";
+import { toast } from "sonner";
 
 const CourseDetails = () => {
   const location = useLocation();
@@ -13,6 +16,9 @@ const CourseDetails = () => {
   const navigate = useNavigate();
   const { course_id } = useParams();
   const { data, isPending, isError } = courseApi.useGetCourseDetails(course_id);
+  
+  const token = useAuthStore((state) => state.token);
+  const { data: isPurchased } = purchaseApi.useCheckPurchase(course_id);
 
   if (isPending) return <LoadingScreen />;
   if (isError) return <ErrorOccured />;
@@ -70,15 +76,27 @@ const CourseDetails = () => {
                 variant="ghost"
                 size="icon"
                 className="cursor-pointer rounded-full h-8 w-8 hover:bg-secondary"
-                onClick={() =>
+                onClick={() => {
+                  if (!isAdmin && !token) {
+                    toast.error("Please login to access course content.");
+                    return;
+                  }
+                  if (!isAdmin && !isPurchased) {
+                    toast.error("Please purchase this course to access its content.");
+                    return;
+                  }
                   navigate(
                     isAdmin
                       ? `/admin/courses/${course_id}/folders/${c._id}`
                       : `/all-courses/${course_id}/folders/${c._id}`,
-                  )
-                }
+                  );
+                }}
               >
-                <ChevronRight className="w-4 h-4" />
+                {!isAdmin && (!token || !isPurchased) ? (
+                  <Lock className="w-4 h-4 text-muted-foreground/80" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </div>

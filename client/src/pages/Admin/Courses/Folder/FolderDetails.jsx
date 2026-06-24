@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { courseApi } from "@/api/courseApi";
 import ErrorOccured from "@/components/error-occured";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,9 @@ import { Plus, ChevronRight, Folder } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import FolderOptionsMenu from "@/components/admin/courses/folder/FolderOptionsMenu";
 import EmptyState from "@/components/empty-state";
+import { useAuthStore } from "@/store/auth";
+import { purchaseApi } from "@/api/purchaseApi";
+import { toast } from "sonner";
 
 const FolderDetails = () => {
   const navigate = useNavigate();
@@ -12,6 +16,20 @@ const FolderDetails = () => {
   const isAdmin = location.pathname.startsWith("/admin");
 
   const { course_id, folder_id } = useParams();
+  const token = useAuthStore((state) => state.token);
+  const { data: isPurchased, isPending: isCheckPending } = purchaseApi.useCheckPurchase(course_id);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      if (!token) {
+        toast.error("Please login to access course content.");
+        navigate(`/all-courses/${course_id}`);
+      } else if (isCheckPending === false && !isPurchased) {
+        toast.error("Please purchase this course to access its content.");
+        navigate(`/all-courses/${course_id}`);
+      }
+    }
+  }, [token, isPurchased, isCheckPending, isAdmin, course_id, navigate]);
   const { data, isPending, isError } = courseApi.useAllCourseFolders(
     course_id,
     folder_id,

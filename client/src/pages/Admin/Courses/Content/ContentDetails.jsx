@@ -53,6 +53,10 @@ import EmptyState from "@/components/empty-state";
 import CertificateModal from "@/components/courses/CertificateModal";
 import QuizPlayer from "@/components/courses/QuizPlayer";
 import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/store/auth";
+import { purchaseApi } from "@/api/purchaseApi";
+import { toast } from "sonner";
+
 
 // A simple markdown-like formatter to render tutor responses beautifully
 const FormattedMessage = ({ text }) => {
@@ -162,10 +166,26 @@ const ContentDetails = () => {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
   const navigate = useNavigate();
+  const { course_id } = useParams();
   const [searchParams] = useSearchParams();
   const parent = searchParams.get("parent");
   const folder_id = searchParams.get("folder_id");
   const play = searchParams.get("play");
+
+  const token = useAuthStore((state) => state.token);
+  const { data: isPurchased, isPending: isCheckPending } = purchaseApi.useCheckPurchase(course_id);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      if (!token) {
+        toast.error("Please login to access course content.");
+        navigate(`/all-courses/${course_id}`);
+      } else if (isCheckPending === false && !isPurchased) {
+        toast.error("Please purchase this course to access its content.");
+        navigate(`/all-courses/${course_id}`);
+      }
+    }
+  }, [token, isPurchased, isCheckPending, isAdmin, course_id, navigate]);
 
   const [activeVideo, setActiveVideo] = useState(null);
   const [activeQuiz, setActiveQuiz] = useState(null);
@@ -272,7 +292,6 @@ const ContentDetails = () => {
     setTimeout(() => setNotesCopied(false), 2000);
   };
 
-  const { course_id } = useParams();
   const earnMutation = studentApi.useEarnRewards();
 
   // Progress Query & Mutation

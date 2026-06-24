@@ -1,17 +1,21 @@
 import { apiClient } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/auth";
 
 export const purchaseApi = {
   useCheckPurchase: (course_id) => {
+    const token = useAuthStore((state) => state.token);
     return useQuery({
-      queryKey: ["check-purchases", course_id],
+      queryKey: ["check-purchases", course_id, !!token],
       queryFn: async () => {
+        if (!token) return false;
         const { data } = await apiClient.post("/purchases/check-purchase", {
           course_id,
         });
         return data.data.isPurchased;
       },
+      enabled: !!course_id,
     });
   },
 
