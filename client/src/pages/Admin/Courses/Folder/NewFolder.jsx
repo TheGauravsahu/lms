@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import FormError from "@/components/form-error";
 import UploadThumbnail from "@/components/admin/courses/upload-thumbnail";
 import { courseApi } from "@/api/courseApi";
-import LoadingButton from "@/components/loading-button";
-import { Plus } from "lucide-react";
+import LoadingButton, { GoBackButton } from "@/components/loading-button";
+import { Plus, FolderPlus, Sparkles, Image, Library } from "lucide-react";
 import RecentUploads from "@/components/admin/uploads/recent-uploads";
 
 const createCourseFolderSchema = z.object({
@@ -41,34 +41,85 @@ const NewFolder = () => {
   }
 
   return (
-    <div className="w-full h-full">
-      <div className="w-full flex items-start">
-        <div className="w-full border-r border-dotted pr-10">
-          <h1 className="font-semibold text-xl mb-2">Create Folder</h1>
-          <p className="text-sm text-muted-foreground">
-            Add data to create folder for the course
-          </p>
+    <div className="space-y-6">
+      {/* Premium Header */}
+      <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 shrink-0">
+            <FolderPlus className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="font-black text-2xl text-foreground flex items-center gap-2">
+              Create Folder
+            </h1>
+            <p className="text-xs text-muted-foreground font-semibold">
+              Organize your curriculum by adding a subfolder or learning module
+            </p>
+          </div>
+        </div>
+      </div>
 
-          <form
-            className="mt-10 w-full w-full space-y-6"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            {/* fields */}
-            <div>
-              <Label>Title</Label>
-              <Input
-                {...form.register("title")}
-                placeholder="English"
-                className="mt-2 bg-input"
-              />
-              <FormError form={form} field="title" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Left Column: Form Card */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-xs space-y-5">
+            <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+                <Sparkles className="w-4.5 h-4.5 fill-orange-500/10" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm text-foreground">Folder Details</h3>
+                <p className="text-[10px] text-muted-foreground font-semibold">Configure basic folder metadata</p>
+              </div>
             </div>
 
-            {/* thumbnail upload */}
-            <div className="w-full">
-              <Label className="my-2">Thumbnail</Label>
-              <UploadThumbnail
-                value={form.watch("thumbnail")}
+            <form
+              id="new-folder-form"
+              className="space-y-5"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div>
+                <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Folder Title</Label>
+                <Input
+                  {...form.register("title")}
+                  placeholder="e.g. Introduction to Variables"
+                  className="mt-2 bg-input/50 focus-visible:ring-orange-500 rounded-xl"
+                  required
+                />
+                <FormError form={form} field="title" />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Cover Image / Thumbnail</Label>
+                <UploadThumbnail
+                  value={form.watch("thumbnail")}
+                  onChange={(url) =>
+                    form.setValue("thumbnail", url, {
+                      shouldValidate: true,
+                    })
+                  }
+                />
+                <FormError form={form} field="thumbnail" />
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Column: Library & Quick Select */}
+        <div className="space-y-6">
+          <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+                <Library className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm text-foreground">Quick Library</h3>
+                <p className="text-[10px] text-muted-foreground font-semibold">Select from recently uploaded assets</p>
+              </div>
+            </div>
+            
+            <div className="overflow-y-auto max-h-56 pr-1">
+              <RecentUploads
                 onChange={(url) =>
                   form.setValue("thumbnail", url, {
                     shouldValidate: true,
@@ -76,21 +127,21 @@ const NewFolder = () => {
                 }
               />
             </div>
+          </div>
 
-            <LoadingButton isPending={isPending} type='submit'>
-              <Plus /> Create Folder
+          {/* Buttons Row */}
+          <div className="flex items-center gap-3">
+            <GoBackButton className="flex-1 rounded-xl text-xs py-5 font-bold border-border/80" />
+            <LoadingButton
+              type="submit"
+              form="new-folder-form"
+              isPending={isPending}
+              className="flex-1 rounded-xl py-5 text-xs bg-linear-to-b from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white font-black cursor-pointer shadow-sm hover:shadow transition-all duration-300"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Folder
             </LoadingButton>
-          </form>
-        </div>
-
-        <div className="w-full pl-8">
-          <RecentUploads
-            onChange={(url) =>
-              form.setValue("thumbnail", url, {
-                shouldValidate: true,
-              })
-            }
-          />
+          </div>
         </div>
       </div>
     </div>

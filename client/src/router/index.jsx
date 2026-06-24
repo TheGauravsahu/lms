@@ -41,6 +41,13 @@ import AdminAnnouncements from "@/pages/Admin/Announcements/AdminAnnouncements";
 import AiTutor from "@/pages/Home/AiTutor";
 import AiRoadmap from "@/pages/Home/AiRoadmap";
 import NotFound from "@/pages/Home/NotFound";
+import Flashcards from "@/pages/Home/Flashcards";
+import AiToolCenter from "@/pages/Home/AiToolCenter";
+import LearnerProfile from "@/pages/Home/LearnerProfile";
+import PublicProfile from "@/pages/Home/PublicProfile";
+import ResumeBuilder from "@/pages/Home/ResumeBuilder";
+import JobBoard from "@/pages/Home/JobBoard";
+import MockInterview from "@/pages/Home/MockInterview";
 
 export const router = createBrowserRouter([
   // user_ui
@@ -124,6 +131,7 @@ export const router = createBrowserRouter([
               { path: "calendar", element: <Calendar /> },
               { path: "resources", element: <Resources /> },
               { path: "watch-later", element: <WatchLater /> },
+              { path: "flashcards", element: <Flashcards /> },
             ],
           },
           {
@@ -141,7 +149,26 @@ export const router = createBrowserRouter([
             element: <UserLayout />,
             children: [{ index: true, element: <AiRoadmap /> }],
           },
+          {
+            path: "ai-tools",
+            element: <UserLayout />,
+            children: [{ index: true, element: <AiToolCenter /> }],
+          },
+          {
+            path: "career",
+            element: <UserLayout />,
+            children: [
+              { path: "profile", element: <LearnerProfile /> },
+              { path: "resume", element: <ResumeBuilder /> },
+              { path: "jobs", element: <JobBoard /> },
+              { path: "interview", element: <MockInterview /> },
+            ],
+          },
         ],
+      },
+      {
+        path: "career/profile/public/:username",
+        element: <PublicProfile />,
       },
       
       {

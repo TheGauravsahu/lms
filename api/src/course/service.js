@@ -4,6 +4,20 @@ import { courseModel } from "./models/course.js";
 import { courseFolderModel } from "./models/folder.js";
 
 class CourseService {
+  createCourse = async ({ title, validity, offer_price, original_price, status, thumbnail }) => {
+    const course = await courseModel.create({
+      title,
+      thumbnail,
+      validity,
+      offer_price,
+      original_price,
+      status,
+    });
+    await deletePattern("courses:*");
+    await deletePattern("search:*");
+    return course;
+  };
+
   getAllCourses = async (options = {}) => {
     const { page, limit, search, filter } = options;
 
@@ -98,6 +112,7 @@ class CourseService {
     });
     await deletePattern("courses:*");
     await deleteCache(`course:${course_id}`);
+    await deletePattern("search:*");
     return updatedCourse;
   };
 
@@ -120,44 +135,64 @@ class CourseService {
   };
 
   createCourseFolder = async ({ course_id, parent_id, title, thumbnail }) => {
-    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
     const folder = await courseFolderModel.create({
       course_id,
-      parent_id,
+      parent_id: parent_id || null,
       title,
       thumbnail,
     });
+    
+    // Invalidate folders list cache for parent
+    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
     await deleteCache(cacheKey);
+    // Invalidate course details cache
+    await deleteCache(`course:${course_id}`);
     return folder;
   };
 
   editCourseFolder = async (course_id, parent_id, title, thumbnail) => {
-    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
-    const folder = await courseFolderModel.findOne({
-      course_id,
-      parent_id,
-    });
+    // parent_id parameter in request holds the _id of the folder
+    const folder = await courseFolderModel.findById(parent_id);
     if (!folder) return null;
 
     const updatedFolder = await courseFolderModel.findByIdAndUpdate(
-      folder._id,
+      parent_id,
       { title, thumbnail },
       { new: true, runValidators: true },
     );
-    await deleteCache(cacheKey);
+    
+    // Invalidate folders list cache for parent
+    const parentCacheKey = `course_folders:${course_id}:${folder.parent_id || "root"}`;
+    await deleteCache(parentCacheKey);
+    // Invalidate course details cache
+    await deleteCache(`course:${course_id}`);
     return updatedFolder;
   };
 
   deleteCourseFolder = async (course_id, parent_id) => {
-    const cacheKey = `course_folders:${course_id}:${parent_id || "root"}`;
-    const folder = await courseFolderModel.findOne({
-      course_id,
-      parent_id,
-    });
+    // parent_id parameter in request holds the _id of the folder to delete
+    const folder = await courseFolderModel.findById(parent_id);
     if (!folder) return false;
 
-    await courseFolderModel.findByIdAndDelete(folder._id);
-    await deleteCache(cacheKey);
+    // Cascade delete nested contents inside this folder
+    await courseContentModel.deleteMany({ folder_id: parent_id });
+    await deleteCache(`course_contents:${parent_id}`);
+
+    // Recursively delete subfolders (1-level nested subfolders)
+    const subfolders = await courseFolderModel.find({ parent_id });
+    for (const sub of subfolders) {
+      await courseContentModel.deleteMany({ folder_id: sub._id });
+      await deleteCache(`course_contents:${sub._id}`);
+      await courseFolderModel.findByIdAndDelete(sub._id);
+    }
+
+    await courseFolderModel.findByIdAndDelete(parent_id);
+
+    // Invalidate folders list cache for parent
+    const parentCacheKey = `course_folders:${course_id}:${folder.parent_id || "root"}`;
+    await deleteCache(parentCacheKey);
+    // Invalidate course details cache
+    await deleteCache(`course:${course_id}`);
     return true;
   };
 
@@ -171,6 +206,8 @@ class CourseService {
       .find({ folder_id })
       .populate("thumbnail content", "url")
       .populate("quiz_id");
+    
+    await setCache(cacheKey, contents, 60 * 60);
     return contents;
   };
 
@@ -182,7 +219,6 @@ class CourseService {
     content,
     quiz_id,
   }) => {
-    const cacheKey = `course_contents:${folder_id}`;
     const data = await courseContentModel.create({
       folder_id,
       title,
@@ -191,7 +227,14 @@ class CourseService {
       content,
       quiz_id: quiz_id || null,
     });
-    await deleteCache(cacheKey);
+    
+    // Invalidate contents cache
+    await deleteCache(`course_contents:${folder_id}`);
+    // Invalidate course details cache
+    const folder = await courseFolderModel.findById(folder_id);
+    if (folder) {
+      await deleteCache(`course:${folder.course_id}`);
+    }
     return data;
   };
 
@@ -203,7 +246,6 @@ class CourseService {
     content,
     quiz_id,
   }) => {
-    const cacheKey = `course_contents:${folder_id}`;
     const course_content = await courseContentModel.findOne({ folder_id });
     if (!course_content) return null;
 
@@ -213,22 +255,35 @@ class CourseService {
       { new: true, runValidators: true },
     );
 
-    await deleteCache(cacheKey);
+    // Invalidate contents cache
+    await deleteCache(`course_contents:${folder_id}`);
+    // Invalidate course details cache
+    const folder = await courseFolderModel.findById(folder_id);
+    if (folder) {
+      await deleteCache(`course:${folder.course_id}`);
+    }
     return updatedCourseContent;
   };
 
   deleteCourseContent = async (folder_id) => {
-    const cacheKey = `course_contents:${folder_id}`;
     const content = await courseContentModel.findOne({ folder_id });
     if (!content) return false;
     await courseContentModel.findByIdAndDelete(content._id);
-    await deleteCache(cacheKey);
+    
+    // Invalidate contents cache
+    await deleteCache(`course_contents:${folder_id}`);
+    // Invalidate course details cache
+    const folder = await courseFolderModel.findById(folder_id);
+    if (folder) {
+      await deleteCache(`course:${folder.course_id}`);
+    }
     return true;
   };
 
   deleteCourse = async (course_id) => {
     const course = await courseModel.findById(course_id);
     if (!course) return false;
+    
     // cascade delete folders and contents
     const folders = await courseFolderModel.find({ course_id });
     for (const folder of folders) {
@@ -237,8 +292,11 @@ class CourseService {
     }
     await courseFolderModel.deleteMany({ course_id });
     await courseModel.findByIdAndDelete(course_id);
+    
     await deletePattern("courses:*");
     await deleteCache(`course:${course_id}`);
+    await deletePattern(`course_folders:${course_id}:*`);
+    await deletePattern("search:*");
     return true;
   };
 }

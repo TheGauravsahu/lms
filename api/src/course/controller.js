@@ -6,17 +6,7 @@ import { courseService } from "./service.js";
 
 class CourseController {
   createCourse = asyncHandler(async (req, res) => {
-    const { title, validity, offer_price, original_price, status, thumbnail } =
-      req.body;
-
-    const course = await courseModel.create({
-      title,
-      thumbnail,
-      validity,
-      offer_price,
-      original_price,
-      status,
-    });
+    const course = await courseService.createCourse(req.body);
     res.success(201, course, "Course created successfully");
   });
 

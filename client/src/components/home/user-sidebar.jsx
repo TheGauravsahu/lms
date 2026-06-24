@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2, MessageSquare, UsersRound, GitPullRequest, Megaphone, Search, CalendarDays, Download, PlaySquare, Sparkles, Bot, Map } from "lucide-react";
+import { Home, Settings, Folder, LayoutDashboard, ShieldCheck, Brain, Trophy, Code2, MessageSquare, UsersRound, GitPullRequest, Megaphone, Search, CalendarDays, Download, PlaySquare, Sparkles, Bot, Map, Briefcase, FileText, User, MessageSquareCode } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/auth";
 
@@ -60,6 +60,7 @@ const productivityItems = [
   { title: "Planner & Deadlines", icon: CalendarDays, href: "/productivity/calendar" },
   { title: "Download Handouts", icon: Download, href: "/productivity/resources" },
   { title: "Watch Queue", icon: PlaySquare, href: "/productivity/watch-later" },
+  { title: "AI Flashcards", icon: Brain, href: "/productivity/flashcards" },
 ];
 
 const communityItems = [
@@ -71,6 +72,14 @@ const communityItems = [
 const aiItems = [
   { title: "AI Tutor Chat", icon: Bot, href: "/ai-tutor" },
   { title: "AI Roadmap", icon: Map, href: "/ai-roadmap" },
+  { title: "AI Generator Hub", icon: Sparkles, href: "/ai-tools" },
+];
+
+const careerItems = [
+  { title: "Public Portfolio", icon: User, href: "/career/profile" },
+  { title: "Resume Builder", icon: FileText, href: "/career/resume" },
+  { title: "Job Board", icon: Briefcase, href: "/career/jobs" },
+  { title: "Mock Interview", icon: MessageSquareCode, href: "/career/interview" },
 ];
 
 const UserSidebar = () => {
@@ -160,6 +169,23 @@ const UserSidebar = () => {
           <SidebarGroupLabel>AI Assistant</SidebarGroupLabel>
           <SidebarMenu>
             {aiItems.map((item) => (
+              <SidebarMenuItem
+                key={item.title}
+                onClick={() => navigate(item.href)}
+              >
+                <SidebarMenuButton className="cursor-pointer gap-4 text-muted-foreground">
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Career Hub</SidebarGroupLabel>
+          <SidebarMenu>
+            {careerItems.map((item) => (
               <SidebarMenuItem
                 key={item.title}
                 onClick={() => navigate(item.href)}
