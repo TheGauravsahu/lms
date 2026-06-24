@@ -150,7 +150,7 @@ const AiRoadmap = () => {
                 {activeRoadmapData ? activeRoadmapData.title : "AI Learning Roadmap"}
               </h3>
               <p className="text-[10px] text-muted-foreground font-semibold">
-                {activeRoadmapData ? `Goal: ${activeRoadmap.goal}` : "Generate a custom, structured curriculum"}
+                {activeRoadmapData ? `Goal: ${activeRoadmap?.goal}` : "Generate a custom, structured curriculum"}
               </p>
             </div>
           </div>
@@ -240,6 +240,11 @@ const AiRoadmap = () => {
                 </>
               )}
             </div>
+          ) : !activeRoadmapData ? (
+            <div className="h-full flex flex-col items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+              <span className="text-xs text-muted-foreground mt-2 font-bold animate-pulse">Loading roadmap details...</span>
+            </div>
           ) : (
             // Visual Roadmap Flowchart
             <div className="max-w-2xl mx-auto space-y-6 py-2">
@@ -255,7 +260,7 @@ const AiRoadmap = () => {
 
               {/* Vertical Node Connector flowchart */}
               <div className="relative border-l-2 border-dashed border-orange-500/30 ml-4 pl-8 space-y-8">
-                {activeRoadmapData.milestones?.map((milestone, idx) => (
+                {activeRoadmapData?.milestones?.map((milestone, idx) => (
                   <div key={idx} className="relative space-y-3">
                     
                     {/* Node Dot */}

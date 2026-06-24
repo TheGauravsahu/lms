@@ -13,7 +13,7 @@ import RecentUploads from "@/components/admin/uploads/recent-uploads";
 
 const createCourseFolderSchema = z.object({
   course_id: z.string().min(1, "course_id is required"),
-  parent_id: z.string().min(1, "parent_id is required").optional(),
+  parent_id: z.string().nullable().optional(),
   title: z.string().min(1, "title is required"),
   thumbnail: z.string().min(1, "thumbnail is required"),
 });
@@ -29,7 +29,9 @@ const NewFolder = () => {
     resolver: zodResolver(createCourseFolderSchema),
     defaultValues: {
       course_id,
-      parent_id: parent_id || null,
+      parent_id: parent_id || undefined,
+      title: "",
+      thumbnail: "",
     },
   });
 

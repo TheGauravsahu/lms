@@ -20,10 +20,10 @@ const LoadingButton = ({ isPending, children, loadingText, type, onClick, classN
   );
 };
 
-export const GoBackButton = () => {
+export const GoBackButton = ({ className, ...props }) => {
   const navigate = useNavigate();
   return (
-    <Button variant="outline" onClick={() => navigate(-1)} type="button">
+    <Button variant="outline" onClick={() => navigate(-1)} type="button" className={className} {...props}>
       <ArrowLeft />
       Go Back
     </Button>
